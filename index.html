@@ -66,6 +66,21 @@ h3{font-size:16px;font-weight:700}
 .btn-gold{position:relative;overflow:hidden;background:var(--metal);color:var(--gold-ink);border:1px solid #F7F9FB;box-shadow:0 10px 26px -12px rgba(220,226,232,.7),inset 0 1px 0 #fff,inset 0 -2px 3px rgba(60,66,74,.35);text-shadow:0 1px 0 rgba(255,255,255,.6)}
 .btn-gold::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-20deg);animation:shine 3.6s ease-in-out infinite;pointer-events:none}
 .btn-gold,.day.sel,.slot.sel,.day.sel small,.day.sel i{text-shadow:0 0 3px #fff,0 0 7px rgba(255,255,255,.95),0 0 12px rgba(255,255,255,.7)!important}
+
+/* interação: letras acesas ao passar o cursor / tocar */
+.btn,.tab,.chip,.day,.slot,.svc,.pro,.payopt,.link,.pf,.strip button{transition:color .18s,text-shadow .18s,transform .18s,filter .18s,border-color .18s,box-shadow .18s}
+@media (hover:hover){
+  .btn:not([disabled]):hover{transform:translateY(-1px);filter:brightness(1.06)}
+  .btn-gold:not([disabled]):hover,.day.sel:hover,.slot.sel:hover{color:#fff!important;text-shadow:0 0 1px #000,0 0 2px #000,0 0 3px #000,0 0 10px #fff,0 0 18px #fff,0 0 28px rgba(255,255,255,.9)!important}
+  .btn-gold:not([disabled]):hover::after{animation-duration:1.1s}
+  .btn-line:hover,.btn-ghost:hover,.chip:hover,.tab:hover,.link:hover,.day:not(.sel):not(:disabled):hover,.slot:not(.sel):not(:disabled):hover,.pro:hover,.payopt:hover{color:#fff;text-shadow:0 0 6px rgba(255,255,255,.95),0 0 14px rgba(255,255,255,.7),0 0 24px rgba(245,244,233,.5);border-color:var(--gold-2)}
+  .tab:hover .ti{color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,.9))}
+  .svc:hover{border-color:var(--gold-2);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 22px -6px rgba(255,255,255,.35)}
+  .svc:hover b,.svc:hover .price{color:#fff;text-shadow:0 0 6px rgba(255,255,255,.95),0 0 16px rgba(255,255,255,.6)}
+  .btn-wa:hover,.btn-ig:hover{text-shadow:0 0 6px #fff,0 0 14px rgba(255,255,255,.85)}
+  .pf:hover,.strip button:hover{transform:translateY(-2px);box-shadow:0 0 24px -6px rgba(255,255,255,.4)}
+}
+.btn:not([disabled]):active,.svc:active,.day:not(:disabled):active,.slot:not(:disabled):active{transform:scale(.98);text-shadow:0 0 8px #fff,0 0 16px rgba(255,255,255,.8)}
 @keyframes shine{0%,55%{left:-60%}85%,100%{left:130%}}
 .btn-wa{background:linear-gradient(180deg,#2FE07A,#1EBE5D);color:#fff;border:0;text-shadow:0 1px 2px rgba(0,0,0,.2);box-shadow:0 8px 22px -10px #25D366}
 .btn-ig{background:linear-gradient(45deg,#FEDA75 0%,#FA7E1E 25%,#D62976 50%,#962FBF 75%,#4F5BD5 100%);color:#fff;border:0;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 8px 22px -10px #D62976}
