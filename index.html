@@ -28,7 +28,8 @@
   --bg:#0A0A0B; --surface:#141517; --surface-2:#1C1D20; --line:#26282B; --line-2:#3F4348;
   --ink:#F1F3F5; --muted:#A6ACB3; --faint:#767D85;
   --gold:#AEB5BE; --gold-2:#E6EAEE; --gold-3:#7D848D; --gold-ink:#0F1113;
-  --metal:linear-gradient(180deg,#F7F9FA 0%,#CDD2D8 45%,#99A0A9 100%);
+  --metal:linear-gradient(180deg,#FFFFFF 0%,#EEF1F4 16%,#AEB6BF 44%,#7E8791 50%,#E9EDF1 58%,#C3C9D0 80%,#F5F7F9 100%);
+  --chrome-text:linear-gradient(180deg,#FFFFFF 0%,#E6EAEE 35%,#8A929C 52%,#F2F4F6 62%,#BFC5CC 100%);
   --ok:#D9DEE3; --ok-bg:#23262A; --warn:#F0B95A; --warn-bg:#2E2412; --bad:#F07067; --bad-bg:#311715;
   --wa:#25D366; --wa-ink:#062611;
   --display:"Cinzel","Trajan Pro",Georgia,serif;
@@ -48,7 +49,7 @@ a{color:inherit}
 
 .eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:700}
 h1,h2,h3{margin:0;text-wrap:balance;line-height:1.15}
-h1{font-family:var(--display);font-weight:600;font-size:27px;letter-spacing:.02em;background:var(--metal);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-family:var(--display);font-weight:600;font-size:27px;letter-spacing:.02em;background:var(--chrome-text);-webkit-background-clip:text;background-clip:text;color:transparent}
 h2{font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:.03em;color:var(--gold-2)}
 h3{font-size:16px;font-weight:700}
 .muted{color:var(--muted)} .small{font-size:13px;color:var(--muted)} .tiny{font-size:12px;color:var(--muted)}
@@ -62,7 +63,9 @@ h3{font-size:16px;font-weight:700}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:14px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .12s,filter .12s;text-align:center}
 .btn:active{transform:scale(.98)}
 .btn svg{width:18px;height:18px;flex:none}
-.btn-gold{background:var(--metal);color:var(--gold-ink);box-shadow:0 8px 24px -10px var(--gold),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-gold{position:relative;overflow:hidden;background:var(--metal);color:var(--gold-ink);border:1px solid #F7F9FB;box-shadow:0 10px 26px -12px rgba(220,226,232,.7),inset 0 1px 0 #fff,inset 0 -2px 3px rgba(60,66,74,.35);text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.btn-gold::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-20deg);animation:shine 3.6s ease-in-out infinite;pointer-events:none}
+@keyframes shine{0%,55%{left:-60%}85%,100%{left:130%}}
 .btn-wa{background:linear-gradient(180deg,#2FE07A,#1EBE5D);color:#fff;border:0;text-shadow:0 1px 2px rgba(0,0,0,.2);box-shadow:0 8px 22px -10px #25D366}
 .btn-ig{background:linear-gradient(45deg,#FEDA75 0%,#FA7E1E 25%,#D62976 50%,#962FBF 75%,#4F5BD5 100%);color:#fff;border:0;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 8px 22px -10px #D62976}
 .btn-line{border:1px solid var(--line-2);background:var(--surface);color:var(--gold-2)}
