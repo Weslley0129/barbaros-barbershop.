@@ -98,6 +98,14 @@ h3{font-size:16px;font-weight:700}
 .hero{position:relative;margin:-20px -16px 0;display:flex;flex-direction:column;padding:0 16px 4px}
 .hero-img{position:relative;margin:0 -16px;aspect-ratio:896/1200;overflow:hidden}
 .hero-img img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
+.eye{position:absolute;z-index:2;width:5.2%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.6);border-radius:50%;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(circle,#FFE9B8 0%,#FFA62B 20%,rgba(255,96,0,.7) 42%,rgba(230,60,0,.22) 62%,transparent 72%);transition:opacity .35s ease,transform .35s ease}
+.eye.bg{width:9%;opacity:0}
+.hero-img:hover .eye,.hero-img.acesa .eye{opacity:1;transform:translate(-50%,-50%) scale(1);animation:brasa 1.6s ease-in-out infinite}
+.hero-img:hover .eye.bg,.hero-img.acesa .eye.bg{opacity:.85}
+.hero-img:hover img,.hero-img.acesa img{filter:brightness(.92) contrast(1.05)}
+.hero-img img{transition:filter .4s}
+@keyframes brasa{0%,100%{filter:brightness(1)}50%{filter:brightness(1.6) saturate(1.2)}}
 .hero-img::after{content:"";position:absolute;inset:auto 0 0 0;height:12%;background:linear-gradient(to bottom,transparent,var(--bg))}
 .hero .tag{font-size:14px;color:var(--ink);max-width:34ch}
 .hero-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
@@ -439,7 +447,7 @@ function diaTemVaga(d,min){return slotsDo(iso(d),min,S.barb).some(s=>s.ok)}
 function Inicio(){
   const saldo=cbSaldo();
   return `<section class="screen">
-  <div class="hero"><div class="hero-img"><img src="${IMG.logo}" alt="Bárbaros Barbershop: gorila com coroa de ouro, navalhas cruzadas e monograma BB dourado"></div>
+  <div class="hero"><div class="hero-img" data-olhos><span class="eye" style="left:44.7%;top:39.8%"></span><span class="eye" style="left:55.2%;top:39.8%"></span><span class="eye bg" style="left:54.2%;top:11.7%"></span><span class="eye bg" style="left:84.6%;top:11.6%"></span><img src="${IMG.logo}" alt="Bárbaros Barbershop: gorila com coroa de ouro, navalhas cruzadas e monograma BB dourado"></div>
     <span class="eyebrow">Barbearia · agendamento online</span>
     <p class="tag" style="margin:8px 0 0">Corte, barba, sobrancelha e coloração com hora marcada. Escolha o serviço, o horário e confirme pelo WhatsApp.</p>
     <div class="hero-cta">
@@ -807,6 +815,7 @@ async function saveCfg(patch){
 
 /* ======= eventos ======= */
 document.addEventListener("click",async e=>{
+  if(e.target.closest('[data-olhos]')){const h=e.target.closest('[data-olhos]');h.classList.add('acesa');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('acesa'),2500)}
   const t=e.target.closest("button,a,[data-close]");if(!t)return;const d=t.dataset;
   if(d.close!==undefined&&e.target===t){S.sheet=null;drawOverlay();return}
   if(t.tagName==="A")return;
