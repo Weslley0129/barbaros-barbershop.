@@ -45,6 +45,14 @@ a{color:inherit}
 .app{max-width:480px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom,0px))}
 .screen{display:flex;flex-direction:column;gap:20px;padding-block:20px 8px}
 .screen.anim{animation:rise .3s ease}
+.local-wrap{padding-top:12px}
+.local{overflow:hidden}
+.mapa{position:relative;aspect-ratio:16/10;background:#15171a;border-bottom:1px solid var(--line)}
+.mapa iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(.15) contrast(1.05)}
+.mapa .mload{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.local .end{display:flex;gap:10px;align-items:flex-start}
+.local .end svg{width:22px;height:22px;flex:none;color:var(--gold-2);margin-top:2px}
+.btn-waze{background:#33CCFF;color:#04232e;border:0}
 .srch{display:flex;align-items:center;gap:10px;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface)}
 .srch input{flex:1;min-width:0;border:0;outline:0;background:none;height:44px}
 .cl{width:100%;text-align:left}
@@ -292,6 +300,7 @@ details summary{cursor:pointer;color:var(--gold-2);font-weight:700}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <div class="app" id="app"></div>
+<div class="app local-wrap" id="local" hidden></div>
 <div id="cartbar"></div>
 <div class="tabbar"><nav id="tabs" aria-label="Navegação"></nav></div>
 <div id="overlay"></div>
@@ -306,7 +315,7 @@ const VAPID = "BEExW8dt7Nv_hORRQ8zx49DGLWp_ffgHrshrYHxR3Q3n_Qo1XCPCGwAEmW-J6zemn
 /* ======= CONFIGURAÇÃO (editável) ======= */
 const LOJA = {
   nome:"Bárbaros Barbershop", wa:"5511944423027", foneTxt:"+55 11 94442-3027",
-  insta:"barbaros_barbersho", pixChave:"+5511944423027", pixNome:"BARBAROS BARBERSHOP", pixCidade:"SAO PAULO", endereco:"",
+  insta:"barbaros_barbersho", pixChave:"+5511944423027", pixNome:"BARBAROS BARBERSHOP", pixCidade:"SAO PAULO", endereco:"Av. Dr. Timóteo Penteado, 2582 – Guarulhos, SP", mapaQ:"Avenida Doutor Timóteo Penteado, 2582, Guarulhos - SP",
   abre:[2,3,4,5,6],            // ter–sáb (0=dom)
   inicio:9*60, fim:19*60, almoco:[12*60+30, 13*60+30],
   antecedenciaMin:60, cancelarAteMin:30, cashback:0.05, diasAgenda:21,
@@ -337,7 +346,7 @@ const PF_CATS=[{id:"todos",nome:"Todos"},{id:"cortes",nome:"Cortes"},{id:"barba"
 const BARB_PADRAO=[{id:"b1",nome:"Barbeiro titular"}];
 
 /* ======= utilidades ======= */
-const ICON={
+const ICON={pin:'<path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',nav:'<path d="M3 11l18-8-8 18-2-8-8-2z"/>',
   home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   scis:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/>',
   cal:'<rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
@@ -605,6 +614,7 @@ function Feito(){
     ${b.pay==="app"?`<div class="card pad w100 stack" style="text-align:left"><div class="lbl">${ic("coin")} Pague agora com Pix</div>${qrSvg(pixPayload(valorPix(b),b.id))?`<div class="qr" style="margin:0 auto">${qrSvg(pixPayload(valorPix(b),b.id))}</div>`:""}<div class="between"><span class="small">Valor</span><b class="price num">${brl(valorPix(b))}</b></div><button class="btn btn-gold" data-pix="${b.id}">${ic("coin")} Abrir Pix (QR e Copia e Cola)</button><p class="tiny" style="margin:0">Cashback de ${brl(b.cbGanho)} liberado depois do atendimento.</p></div>`:""}
     <div class="stack w100"><a class="btn btn-wa" href="${waTo(LOJA.wa,msgAgendamento(b))}" target="_blank" rel="noopener">${ic("wa")} ${b.registrado?"Avisar também no WhatsApp (opcional)":"Enviar pelo WhatsApp"}</a>
     <a class="btn btn-line" href="${gcal(b)}" target="_blank" rel="noopener">${ic("bell")} Lembrete no Google Agenda</a>
+    <a class="btn btn-line" href="${mapsDir()}" target="_blank" rel="noopener">${ic("pin")} Como chegar · ${esc(LOJA.endereco)}</a>
     <button class="btn btn-ghost" data-copy="${esc(msgAgendamento(b))}" data-msg="Mensagem copiada">${ic("copy")} Copiar mensagem</button></div>
     <button class="link" data-novo>Fazer outro agendamento</button></div></section>`;
 }
@@ -638,6 +648,15 @@ function Portfolio(){
   <div class="grid">${list.map(p=>`<button class="pf" data-lb="${p.i}"><img src="${IMG[p.img]}" alt="${esc(p.t)}" loading="lazy"><span><small>${esc(PF_CATS.find(c=>c.id===p.cat).nome)}</small>${esc(p.t)}</span></button>`).join("")}</div>
   <button class="btn btn-gold" data-go="agendar">${ic("cal")} Quero esse estilo</button></section>`;
 }
+const mapsDir=()=>"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(LOJA.mapaQ);
+const wazeUrl=()=>"https://waze.com/ul?q="+encodeURIComponent(LOJA.mapaQ)+"&navigate=yes";
+function Localizacao(){
+  return `<div class="card local" id="onde"><div class="mapa"><span class="mload">Carregando mapa…</span><iframe title="Mapa: ${esc(LOJA.endereco)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="https://maps.google.com/maps?q=${encodeURIComponent(LOJA.mapaQ)}&z=16&hl=pt-BR&output=embed"></iframe></div>
+  <div class="pad stack"><span class="eyebrow">Onde estamos</span><div class="end">${ic("pin")}<div><b>Av. Dr. Timóteo Penteado, 2582</b><div class="small">Guarulhos – SP</div></div></div>
+  <div class="row"><a class="btn btn-gold btn-sm" style="flex:1" href="${mapsDir()}" target="_blank" rel="noopener">${ic("nav")} Como chegar</a><a class="btn btn-waze btn-sm" style="flex:1" href="${wazeUrl()}" target="_blank" rel="noopener">${ic("nav")} Waze</a></div></div></div>`;
+}
+// O mapa fica fora do #app para não recarregar a cada toque na tela.
+function localSync(on,pad){const el=document.getElementById("local");if(!el)return;if(on&&!el.firstChild)el.innerHTML=Localizacao();el.hidden=!on;el.style.paddingBottom=on?pad:""}
 function Barbeiro(){
   return `<div class="card pad stack"><div class="barber-pic"><img src="${IMG.barbeiro}" alt="Barbeiro da Bárbaros com a máquina na mão"><div><span class="eyebrow">A casa</span><h2 style="margin-top:4px">${LOJA.nome}</h2><p class="small" style="margin:2px 0 0">Atendimento com hora marcada, de terça a sábado.</p></div></div>
   <ul class="rules"><li>Ter a sáb, 9h às 19h · almoço 12h30–13h30</li><li>Agende com pelo menos 1h de antecedência</li><li>Cancelamento até 30 min antes do horário</li>${S.cfg.endereco?`<li>${esc(S.cfg.endereco)}</li>`:""}</ul>
@@ -804,7 +823,10 @@ function render(){
     const {preco,min,aPartir}=totals();
     document.getElementById("cartbar").innerHTML=S.sel.size&&["inicio","servicos"].includes(S.tab)?`<div class="cartbar"><div class="s"><b class="num">${aPartir?"a partir de ":""}${brl(preco)}</b><br>${[...S.sel].map(id=>svc(id).nome).join(" + ")} · ${dur(min)}</div><button class="btn btn-gold" data-go="agendar" data-skip="1">Escolher horário ${ic("r")}</button></div>`:"";
   }
-  app.style.paddingBottom=document.getElementById("cartbar").innerHTML?"calc(170px + env(safe-area-inset-bottom,0px))":"";
+  const padB=document.getElementById("cartbar").innerHTML?"calc(170px + env(safe-area-inset-bottom,0px))":"";
+  const mapaOn=APP==="cliente"&&S.tab==="inicio";
+  localSync(mapaOn,padB);
+  app.style.paddingBottom=mapaOn?"0px":padB;
   const scr=app.querySelector(".screen");
   if(tela!==ULTIMA_TELA){if(scr)scr.classList.add("anim");ULTIMA_TELA=tela}else{window.scrollTo(0,y)}
   if(fid){const el=document.getElementById(fid);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
