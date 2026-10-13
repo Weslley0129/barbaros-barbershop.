@@ -613,7 +613,7 @@ function Conta(){
   const now=new Date();
   const prox=S.meus.filter(b=>b.status!=="cancelado"&&new Date(b.data+"T"+b.hora)>=now).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora));
   const hist=S.meus.filter(b=>!prox.includes(b)).sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));
-  const card=b=>{const d=fromIso(b.data),[lbl,cls]=bkStatus(b),mins=(new Date(b.data+"T"+b.hora)-now)/60000,podeCancel=b.status!=="cancelado"&&mins>LOJA.cancelarAteMin;
+  const card=b=>{const d=fromIso(b.data),[lbl,cls]=bkStatus(b),mins=(new Date(b.data+"T"+b.hora)-now)/60000,podeCancel=!["cancelado","faltou","concluido"].includes(b.status)&&mins>=LOJA.cancelarAteMin;
     return `<div class="card bk"><div class="when"><div class="datebox"><small>${MES[d.getMonth()]}</small><b>${d.getDate()}</b></div><div style="flex:1;min-width:0"><b>${esc(b.servicos.join(" + "))}</b><div class="small num">${DOW[d.getDay()]} · ${b.hora}–${hm(toMin(b.hora)+b.min)} · ${b.pay==="app"?"Pix pelo app":"na barbearia"}</div></div></div>
     <div class="between"><span class="pill ${cls}">${lbl}</span><span class="price">${brl(b.preco-(b.cbUsado||0))}</span></div>
     ${prox.includes(b)?`<div class="row" style="flex-wrap:wrap">${b.pay==="app"?`<button class="btn btn-gold btn-sm" data-pix="${b.id}">${ic("coin")} Pagar Pix</button>`:""}<a class="btn btn-line btn-sm" href="${gcal(b)}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>${podeCancel?`<button class="btn btn-danger btn-sm" data-cancel="${b.id}">Cancelar</button>`:`<span class="tiny">Cancelamento só até ${LOJA.cancelarAteMin} min antes. Fale no WhatsApp.</span>`}</div>`:""}</div>`};
@@ -891,7 +891,7 @@ function clientesAgg(){
     const val=(a.preco||0)-(a.cbUsado||0);
     if(a.status==="concluido"){c.visitas++;c.gasto+=val;if(a.pay==="app")c.cb+=Math.round(val*LOJA.cashback*100)/100}
     if(a.status==="faltou")c.faltas++;
-    if(a.status!=="cancelado")c.cb-=a.cbUsado||0;
+    if(!["cancelado","faltou"].includes(a.status))c.cb-=a.cbUsado||0;
     if((a.data+a.hora)>c.ultima){c.ultima=a.data+a.hora;c.nome=a.nome}
   }
   return Object.values(m).map(c=>({...c,cb:Math.max(0,Math.round(c.cb*100)/100)}));

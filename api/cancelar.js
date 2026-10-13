@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const it = (await index()).find(x => x.id === b.id && x.fone === fone);
     if (!it) return send(res, 404, { erro: "Agendamento não encontrado." });
     if (INATIVO.includes(it.status)) return send(res, 200, { ok: true });
-    const now = spNow(), antes = it.data > now.date || (it.data === now.date && it.i - now.min > LOJA.cancelarAteMin);
+    const now = spNow(), antes = it.data > now.date || (it.data === now.date && it.i - now.min >= LOJA.cancelarAteMin);
     if (!antes) return send(res, 400, { erro: "Cancelamento só até 30 min antes. Fale no WhatsApp." });
     await setStatus(it.id, "cancelado");
     const d = await readJSON(it.path);

@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { temArmazenamento, SEM_ARMAZENAMENTO, remove, brl, toMin, conflito, quando as quandoTxt, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
+import { temArmazenamento, SEM_ARMAZENAMENTO, remove, brl, toMin, conflito, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
   STATUS, LOJA, subValida, subHash, pushAdmin, pushCliente, quando } from "../lib/core.js";
 // API do Painel do Barbeiro, protegida por PIN.
 function autorizado(req) {
@@ -45,7 +45,10 @@ export default async function handler(req, res) {
       if (b.status === "cancelado") await pushCliente(it.fone, { title: "Horário cancelado", body: `Seu horário de ${quando(it.data, it.hora)} foi cancelado pela barbearia. Fale com a gente no WhatsApp.`, tag: "ag-" + it.id }).catch(() => {});
       return send(res, 200, { ok: true });
     }
-    if (b.action === "pago") { await putJSON(`pago/${b.id}.json`, { t: Date.now() }); return send(res, 200, { ok: true }); }
+    if (b.action === "pago") {
+      if (!(await index()).some(x => x.id === b.id)) return send(res, 404, { erro: "Agendamento não encontrado." });
+      await putJSON(`pago/${b.id}.json`, { t: Date.now() }); return send(res, 200, { ok: true });
+    }
     if (b.action === "novo") {
       const a = b.booking || {}, sv = calcServicos(a.svcIds); if (!sv) return send(res, 400, { erro: "Escolha o serviço." });
       if (!/^\d{4}-\d{2}-\d{2}$/.test(a.data || "") || !/^\d{2}:\d{2}$/.test(a.hora || "")) return send(res, 400, { erro: "Dia ou hora inválidos." });
@@ -64,6 +67,7 @@ export default async function handler(req, res) {
       const items = await index(), it = items.find(x => x.id === b.id);
       if (!it) return send(res, 404, { erro: "Agendamento não encontrado." });
       const i = toMin(b.hora);
+      if (i < 0 || i >= 24 * 60) return send(res, 400, { erro: "Hora inválida." });
       if (!b.forcar && conflito(items, b.data, i, it.min, it.barb, it.id)) return send(res, 409, { erro: "Esse horário já tem outro cliente." });
       const d = await readJSON(it.path); if (!d) return send(res, 404, { erro: "Agendamento não encontrado." });
       const novo = { ...d, data: b.data, hora: b.hora, remarcadoEm: new Date().toISOString(), antes: `${it.data} ${it.hora}` };
@@ -72,7 +76,7 @@ export default async function handler(req, res) {
       if (destino !== it.path) await remove(it.path);
       for (const l of await listAll(`lemb/${it.id}.json`)) await remove(l.pathname);
       if (it.status !== "confirmado") await setStatus(it.id, "confirmado");
-      const enviados = await pushCliente(it.fone, { title: "Seu horário foi remarcado ✂️", body: `Novo horário: ${quandoTxt(b.data, b.hora)} na Bárbaros. Qualquer dúvida, chama no WhatsApp.`, tag: "ag-" + it.id, url: "/#conta" }).catch(() => 0);
+      const enviados = await pushCliente(it.fone, { title: "Seu horário foi remarcado ✂️", body: `Novo horário: ${quando(b.data, b.hora)} na Bárbaros. Qualquer dúvida, chama no WhatsApp.`, tag: "ag-" + it.id, url: "/#conta" }).catch(() => 0);
       return send(res, 200, { ok: true, enviados });
     }
     if (b.action === "apagar") {
