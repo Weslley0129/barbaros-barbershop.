@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     if (fone.length < 10 || !ids.length) return send(res, 200, { status: {} });
     const items = await index();
     const meus = items.filter(x => x.fone === fone && ids.includes(x.id));
-    const status = Object.fromEntries(meus.map(x => [x.id, { status: x.status, pago: x.pago }]));
+    const status = Object.fromEntries(meus.map(x => [x.id, { status: x.status, pago: x.pago, data: x.data, hora: x.hora }]));
     const saldo = meus.length ? await saldoCliente(items, fone) : null;
     send(res, 200, { status, saldo });
   } catch (e) { console.error(e); send(res, 500, { erro: "Falha ao consultar." }); }

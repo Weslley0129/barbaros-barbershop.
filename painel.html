@@ -400,7 +400,7 @@ async function carregaOcupados(){if(!API)return;try{const j=await api("/ocupados
 async function syncMeus(){
   if(!API||!S.meus.length)return;const fone=S.fone||S.meus[S.meus.length-1].fone;
   try{const j=await api("/meus?fone="+encodeURIComponent(digits(fone))+"&ids="+S.meus.slice(-40).map(b=>b.id).join(","));
-    let mud=false;for(const b of S.meus){const x=j.status&&j.status[b.id];if(x&&(x.status!==b.status||x.pago!==b.pago)){b.status=x.status;b.pago=x.pago;mud=true}}
+    let mud=false;for(const b of S.meus){const x=j.status&&j.status[b.id];if(x&&(x.status!==b.status||x.pago!==b.pago||(x.data&&(x.data!==b.data||x.hora!==b.hora)))){b.status=x.status;b.pago=x.pago;if(x.data){b.data=x.data;b.hora=x.hora}mud=true}}
     if(typeof j.saldo==="number"&&j.saldo!==S.cbServer){S.cbServer=j.saldo;mud=true}
     if(mud){store.set("meus",S.meus);render()}}catch(e){}
 }
@@ -666,6 +666,7 @@ function PainelAgenda(){
         ${a.pay==="app"&&!a.pago?`<button class="btn btn-line btn-sm" data-pix="${a.id}">${ic("coin")} QR Pix</button><button class="btn btn-line btn-sm" data-apago="${a.id}">Marcar pago</button>`:""}
         ${a.fone?`<a class="btn btn-wa btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>`:""}
         ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-ghost btn-sm" data-ast="faltou" data-id="${a.id}">Faltou</button><button class="btn btn-ghost btn-sm" data-ast="cancelado" data-id="${a.id}">Cancelar</button>`:""}
+        ${APP==="adminweb"&&["pendente","confirmado","faltou"].includes(a.status)?`<button class="btn btn-line btn-sm" data-remarcar="${a.id}">${ic("cal")} Remarcar</button>`:""}
         ${APP==="adminweb"&&a.status==="cancelado"?`<button class="btn btn-ghost btn-sm" data-apagar="${a.id}">Apagar</button>`:""}
       </div></div></div>`;}
   if(!items.length) rows=`<div class="card empty"><span>${lojaAberta(d)?"Nenhum horário marcado neste dia.":"Barbearia fechada neste dia."}</span></div>`;
@@ -918,13 +919,52 @@ function msgFalta(a){
   return `Fala, ${n}! Tudo certo?\n\nSentimos sua falta hoje às ${a.hora} aqui na ${LOJA.nome}. Aconteceu alguma coisa?\n\nBora remarcar? Escolha um novo horário pelo app: ${URL_APP}/#agendar\n\nOu responde essa mensagem que a gente encaixa você no melhor horário. 💈`;
 }
 function MsgSheet(a,st,enviados){
+  if(st==="remarcado")return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Avisar cliente">
+    <div class="between"><div><span class="eyebrow">Horário remarcado</span><h2 style="margin-top:4px">Avisar ${esc((a.nome||"").split(" ")[0])}</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <div class="note ${enviados?"info":""}">${enviados?"Notificação com o novo horário enviada para o celular do cliente.":"O cliente não ativou os avisos no celular. Mande a mensagem pelo WhatsApp."}</div>
+    <div class="field"><label class="small" for="msgwa">Mensagem (pode editar antes de enviar)</label><textarea id="msgwa" style="min-height:180px;font-size:14px">${esc(msgRemarcado(a))}</textarea></div>
+    ${digits(a.fone).length>=10?`<button class="btn btn-wa" data-wamsg="${esc(digits(a.fone).slice(-11))}">${ic("wa")} Enviar no WhatsApp</button>`:""}
+    <button class="btn btn-ghost" data-closesheet>Agora não</button></div></div>`;
   const ok=st==="concluido",txt=ok?msgObrigado(a):msgFalta(a);
   return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Mensagem para o cliente">
     <div class="between"><div><span class="eyebrow">${ok?"Atendimento concluído":"Cliente faltou"}</span><h2 style="margin-top:4px">${ok?"Agradecer ":"Reagendar "}${esc((a.nome||"").split(" ")[0])}</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
     <div class="note ${enviados?"info":""}">${enviados?`${ic("bell",'style="width:14px;height:14px;vertical-align:-2px"')} Notificação ${ok?"de agradecimento":"pedindo para reagendar"} enviada para o celular do cliente.`:"O cliente não ativou os avisos no celular. Mande a mensagem pelo WhatsApp."}</div>
     <div class="field"><label class="small" for="msgwa">Mensagem (pode editar antes de enviar)</label><textarea id="msgwa" style="min-height:220px;font-size:14px">${esc(txt)}</textarea></div>
     <button class="btn btn-wa" data-wamsg="${esc(digits(a.fone).slice(-11))}">${ic("wa")} Enviar no WhatsApp</button>
+    ${ok?"":`<button class="btn btn-line" data-remarcar="${a.id}">${ic("cal")} Já remarcar agora</button>`}
     <button class="btn btn-ghost" data-closesheet>Agora não</button></div></div>`;
+}
+/* ======= remarcar ======= */
+function horariosDia(data,a){
+  const out=[];const d=fromIso(data);
+  for(let t=LOJA.inicio;t<=LOJA.fim-Math.min(a.min,30);t+=15){
+    const f=t+Math.max(a.min,10);let nota="";
+    if(!lojaAberta(d))nota="fechado";
+    else if(t<LOJA.almoco[1]&&f>LOJA.almoco[0])nota="almoço";
+    else if(f>LOJA.fim)nota="passa das 19h";
+    else{const c=S.agenda.find(x=>x.id!==a.id&&x.data===data&&!["cancelado","faltou"].includes(x.status)&&x.barb===a.barb&&t<toMin(x.hora)+x.min&&f>toMin(x.hora));if(c)nota="ocupado: "+c.nome.split(" ")[0]}
+    out.push({t,nota});
+  }
+  return out;
+}
+function RemarcarSheet(a,data,hora){
+  data=data||a.data;const hs=horariosDia(data,a);
+  if(!hora){const livre=hs.find(h=>!h.nota&&(data!==a.data||hm(h.t)!==a.hora));hora=livre?hm(livre.t):a.hora}
+  const sel=hs.find(h=>hm(h.t)===hora),aviso=sel&&sel.nota;
+  const dias=[];const b0=new Date();b0.setHours(0,0,0,0);for(let k=0;k<30;k++){const x=new Date(b0);x.setDate(b0.getDate()+k);dias.push(x)}
+  return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Remarcar">
+    <div class="between"><div><span class="eyebrow">Remarcar</span><h2 style="margin-top:4px">${esc(a.nome)}</h2><span class="tiny">${esc(a.servicos.join(" + "))} · ${dur(a.min)} · marcado para ${DOWS[fromIso(a.data).getDay()]} ${br(a.data)} às ${a.hora}</span></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <div class="lbl">${ic("cal")} Novo dia</div>
+    <div class="days">${dias.map(x=>`<button class="day ${iso(x)===data?"sel":""}" data-rmdia="${iso(x)}" data-id="${a.id}"><small>${DOWS[x.getDay()]}</small><b>${x.getDate()}</b><i>${lojaAberta(x)?MES[x.getMonth()]:"fechado"}</i></button>`).join("")}</div>
+    <div class="field"><label class="lbl" for="rmhora">${ic("clock")} Novo horário</label><select id="rmhora" data-id="${a.id}" data-dia="${data}">${hs.map(h=>`<option value="${hm(h.t)}" ${hm(h.t)===hora?"selected":""}>${hm(h.t)} – ${hm(h.t+a.min)}${h.nota?" · "+h.nota:""}</option>`).join("")}</select></div>
+    ${aviso?`<div class="note">Atenção: ${esc(aviso)}. Se salvar, os dois horários ficam marcados ao mesmo tempo.</div>`:""}
+    <span class="err" id="rmerr"></span>
+    <button class="btn btn-gold" data-rmsalvar="${a.id}" data-dia="${data}" data-forcar="${aviso?1:""}">${ic("check")} Salvar novo horário</button>
+    <p class="tiny" style="margin:0">O cliente recebe aviso no celular (se ativou) e você pode mandar a mensagem no WhatsApp em seguida.</p></div></div>`;
+}
+function msgRemarcado(a){
+  const n=(a.nome||"").split(" ")[0]||"";
+  return `Fala, ${n}! Tudo certo?\n\nSeu horário na ${LOJA.nome} foi remarcado para *${DOW[fromIso(a.data).getDay()]}, ${br(a.data)} às ${a.hora}* (${a.servicos.join(" + ")}).\n\nSe esse horário não der pra você, é só responder aqui que a gente ajusta. ✂️`;
 }
 function Login(){
   const carregando=S.auth==="carregando";
@@ -1026,6 +1066,14 @@ document.addEventListener("click",async e=>{
   if(d.ast){setStatus(d.id,d.ast);return}
   if(d.apago&&APP==="adminweb"){try{await adm({action:"pago",id:d.apago});const a=S.agenda.find(x=>x.id===d.apago);if(a)a.pago=true;toast("Pagamento registrado");render()}catch(err){toast("Não foi possível salvar.")}return}
   if(d.cli){S.sheet=ClienteSheet(d.cli);drawOverlay();return}
+  if(d.remarcar){const a=S.agenda.find(x=>x.id===d.remarcar);if(a){S.sheet=RemarcarSheet(a);drawOverlay()}return}
+  if(d.rmdia){const a=S.agenda.find(x=>x.id===d.id);if(a){S.sheet=RemarcarSheet(a,d.rmdia);drawOverlay()}return}
+  if(d.rmsalvar){const a=S.agenda.find(x=>x.id===d.rmsalvar);if(!a)return;const hora=document.getElementById("rmhora").value,data=d.dia,err=document.getElementById("rmerr");
+    if(data===a.data&&hora===a.hora){err.textContent="Escolha um dia ou horário diferente do atual.";return}
+    t.disabled=true;try{const r=await adm({action:"remarcar",id:a.id,data,hora,forcar:!!d.forcar});
+      a.data=data;a.hora=hora;if(a.status!=="confirmado")a.status="confirmado";if(BK[a.id]){BK[a.id].data=data;BK[a.id].hora=hora;store.set("bkcache",BK)}
+      S.aDay=data;S.sheet=MsgSheet(a,"remarcado",r.enviados||0);render();drawOverlay();toast("Horário remarcado")}
+    catch(x){t.disabled=false;err.textContent=x.message||"Não foi possível remarcar."}return}
   if(d.wamsg){const t2=document.getElementById("msgwa");openLink(waTo("55"+d.wamsg,t2?t2.value:""));S.sheet=null;drawOverlay();toast("WhatsApp aberto com a mensagem");return}
   if(d.apagar){if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent="Toque de novo para apagar";setTimeout(()=>{if(t.isConnected){t.dataset.armed="";t.textContent="Apagar"}},4000);return}
     try{await adm({action:"apagar",id:d.apagar});delete BK[d.apagar];store.set("bkcache",BK);S.agenda=S.agenda.filter(x=>x.id!==d.apagar);toast("Agendamento apagado");render()}catch(err){toast(err.message||"Não foi possível apagar.")}return}
@@ -1054,6 +1102,7 @@ document.addEventListener("click",async e=>{
   if(d.savecfg!==undefined){saveCfg({pixChave:document.getElementById("pix").value.trim(),endereco:document.getElementById("end").value.trim()});return}
 });
 function maskFone(v){v=digits(v).slice(0,11);if(v.length>7)return`(${v.slice(0,2)}) ${v.slice(2,3)} ${v.slice(3,7)}-${v.slice(7)}`;if(v.length>3)return`(${v.slice(0,2)}) ${v.slice(2,3)} ${v.slice(3)}`;if(v.length>2)return`(${v.slice(0,2)}) ${v.slice(2)}`;return v}
+document.addEventListener("change",e=>{if(e.target.id==="rmhora"){const a=S.agenda.find(x=>x.id===e.target.dataset.id);if(a){S.sheet=RemarcarSheet(a,e.target.dataset.dia,e.target.value);drawOverlay()}}});
 document.addEventListener("submit",e=>{if(e.target.matches("[data-login]")){e.preventDefault();const v=digits(document.getElementById("pinin").value);if(!v)return;S.pin=v;S.loginErr="";carregaAdmin()}});
 document.addEventListener("input",e=>{const id=e.target.id;
   if(id==="qcli"){S.qcli=e.target.value;render();return}

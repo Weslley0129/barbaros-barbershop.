@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { temArmazenamento, SEM_ARMAZENAMENTO, remove, brl, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
+import { temArmazenamento, SEM_ARMAZENAMENTO, remove, brl, toMin, conflito, quando as quandoTxt, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
   STATUS, LOJA, subValida, subHash, pushAdmin, pushCliente, quando } from "../lib/core.js";
 // API do Painel do Barbeiro, protegida por PIN.
 function autorizado(req) {
@@ -58,6 +58,22 @@ export default async function handler(req, res) {
         cbGanho: a.pay === "app" ? Math.round((preco - cbUsado) * LOJA.cashback * 100) / 100 : 0, criado: new Date().toISOString(), origem: "painel" };
       await putJSON(bookingPath(doc), doc); await setStatus(id, "confirmado");
       return send(res, 200, { ok: true, id });
+    }
+    if (b.action === "remarcar") {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(b.data || "") || !/^\d{2}:\d{2}$/.test(b.hora || "")) return send(res, 400, { erro: "Dia ou hora inválidos." });
+      const items = await index(), it = items.find(x => x.id === b.id);
+      if (!it) return send(res, 404, { erro: "Agendamento não encontrado." });
+      const i = toMin(b.hora);
+      if (!b.forcar && conflito(items, b.data, i, it.min, it.barb, it.id)) return send(res, 409, { erro: "Esse horário já tem outro cliente." });
+      const d = await readJSON(it.path); if (!d) return send(res, 404, { erro: "Agendamento não encontrado." });
+      const novo = { ...d, data: b.data, hora: b.hora, remarcadoEm: new Date().toISOString(), antes: `${it.data} ${it.hora}` };
+      const destino = bookingPath(novo);
+      await putJSON(destino, novo);
+      if (destino !== it.path) await remove(it.path);
+      for (const l of await listAll(`lemb/${it.id}.json`)) await remove(l.pathname);
+      if (it.status !== "confirmado") await setStatus(it.id, "confirmado");
+      const enviados = await pushCliente(it.fone, { title: "Seu horário foi remarcado ✂️", body: `Novo horário: ${quandoTxt(b.data, b.hora)} na Bárbaros. Qualquer dúvida, chama no WhatsApp.`, tag: "ag-" + it.id, url: "/#conta" }).catch(() => 0);
+      return send(res, 200, { ok: true, enviados });
     }
     if (b.action === "apagar") {
       const id = String(b.id || ""); if (!/^[A-Z0-9]{5,12}$/.test(id)) return send(res, 400, { erro: "Código inválido." });
