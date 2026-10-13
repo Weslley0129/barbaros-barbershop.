@@ -716,6 +716,7 @@ function PainelAjustes(){
 function Painel(){
   const tabsA={agenda:PainelAgenda,clientes:PainelClientes,ajustes:PainelAjustes};
   return `<section class="screen"><div class="modebar"><span>${ic("scis",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} <b>Painel do Barbeiro</b> · ${S.cloud==="on"?"ao vivo":S.cloud==="erro"?"sem conexão":"conectando…"}</span>${APP==="adminweb"?`<button class="link" data-recarregar>Atualizar ${ic("back",'style="width:14px;height:14px"')}</button>`:`<a class="link" href="${URL_CLIENTE}" target="_blank" rel="noopener">App do cliente ${ic("r",'style="width:14px;height:14px"')}</a>`}</div>
+  ${APP==="adminweb"&&S.aviso?`<div class="note"><b>Agenda online desativada.</b> ${esc(S.aviso)} Até ativar, os pedidos dos clientes chegam só pelo WhatsApp.</div>`:""}
   ${tabsA[S.aTab]()}</section>`;
 }
 function NovoAg(prefill={}){
@@ -862,10 +863,10 @@ async function carregaAdmin(silencioso){
     for(let k=0;k<falt.length;k+=60){const r=await adm({action:"get",ids:falt.slice(k,k+60)});Object.assign(BK,r.docs||{})}
     if(falt.length)store.set("bkcache",BK);
     S.agenda=j.items.filter(i=>BK[i.id]).map(i=>({...BK[i.id],id:i.id,status:i.status,pago:i.pago}));
-    S.inst=j.installs;S.auth="ok";S.cloud="on";S.loginErr="";store.set("pin",S.pin);
+    S.inst=j.installs;S.aviso=j.aviso||"";S.auth="ok";S.cloud="on";S.loginErr="";store.set("pin",S.pin);
   }catch(e){
     if(e.status===401){S.pin="";store.set("pin","");S.auth="nao";S.loginErr="PIN incorreto."}
-    else{S.cloud="erro";if(S.auth!=="ok"){S.auth="nao";S.loginErr="Sem conexão com o servidor. Tente de novo."}}
+    else{S.cloud="erro";if(S.auth!=="ok"){S.auth="nao";S.loginErr=e.status?(e.message||"Erro no servidor. Tente de novo."):"Sem internet ou servidor fora do ar. Tente de novo."}}
   }
   render();
 }

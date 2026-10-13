@@ -1,7 +1,8 @@
-import { body, send, index, fone11, setStatus, spNow, toMin, LOJA, INATIVO, pushAdmin, readJSON, quando } from "../lib/core.js";
+import { temArmazenamento, SEM_ARMAZENAMENTO, body, send, index, fone11, setStatus, spNow, toMin, LOJA, INATIVO, pushAdmin, readJSON, quando } from "../lib/core.js";
 // Cancelamento feito pelo cliente (até 30 min antes).
 export default async function handler(req, res) {
   if (req.method !== "POST") return send(res, 405, { erro: "Use POST." });
+  if (!temArmazenamento()) return send(res, 503, { erro: SEM_ARMAZENAMENTO });
   try {
     const b = body(req), fone = fone11(b.fone);
     const it = (await index()).find(x => x.id === b.id && x.fone === fone);

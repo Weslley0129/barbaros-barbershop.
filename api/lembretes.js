@@ -1,8 +1,9 @@
-import { index, readJSON, putJSON, spNow, INATIVO, pushCliente, pushAdmin, quando } from "../lib/core.js";
+import { temArmazenamento, index, readJSON, putJSON, spNow, INATIVO, pushCliente, pushAdmin, quando } from "../lib/core.js";
 // Tarefa diária (18h de Brasília): lembra os clientes de amanhã e manda o resumo do dia ao barbeiro.
 export default async function handler(req, res) {
   const secret = process.env.CRON_SECRET;
   if (secret && req.headers.authorization !== `Bearer ${secret}`) { res.statusCode = 401; return res.end("unauthorized"); }
+  if (!temArmazenamento()) { res.end(JSON.stringify({ ok: false, motivo: "sem armazenamento" })); return; }
   const amanha = spNow(1).date;
   const items = (await index({ prefixes: [`b/${amanha}`] })).filter(x => !INATIVO.includes(x.status)).sort((a, b) => a.i - b.i);
   let enviados = 0;

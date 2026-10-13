@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
+import { temArmazenamento, SEM_ARMAZENAMENTO, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
   STATUS, LOJA, subValida, subHash, pushAdmin, pushCliente, quando } from "../lib/core.js";
 // API do Painel do Barbeiro, protegida por PIN.
 function autorizado(req) {
@@ -10,6 +10,10 @@ function autorizado(req) {
 const contar = async p => new Set((await listAll(p)).map(b => b.pathname.split("/").pop())).size;
 export default async function handler(req, res) {
   if (!autorizado(req)) { await new Promise(r => setTimeout(r, 800)); return send(res, 401, { erro: "PIN incorreto." }); }
+  if (!temArmazenamento()) {
+    if (req.method === "GET") return send(res, 200, { items: [], installs: { app: 0, visitantes: 0, painel: 0 }, aviso: SEM_ARMAZENAMENTO });
+    return send(res, 503, { erro: SEM_ARMAZENAMENTO });
+  }
   try {
     if (req.method === "GET") {
       const [items, app, web, painel] = await Promise.all([index(), listAll("inst/cliente/app/"), listAll("inst/cliente/web/"), contar("inst/painel/app/")]);

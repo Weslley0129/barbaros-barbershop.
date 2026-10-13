@@ -1,8 +1,9 @@
-import { body, send, limpa, calcServicos, validaHorario, conflito, index, mesesPrefixos, bookingPath, putJSON, setStatus,
+import { temArmazenamento, SEM_ARMAZENAMENTO, body, send, limpa, calcServicos, validaHorario, conflito, index, mesesPrefixos, bookingPath, putJSON, setStatus,
   fone11, toMin, novoId, BARBEIROS, LOJA, saldoCliente, pushAdmin, quando, brl } from "../lib/core.js";
 // Recebe um agendamento do app do cliente, valida as regras da casa e avisa o barbeiro.
 export default async function handler(req, res) {
   if (req.method !== "POST") return send(res, 405, { erro: "Use POST." });
+  if (!temArmazenamento()) return send(res, 503, { erro: SEM_ARMAZENAMENTO });
   try {
     const b = body(req);
     const nome = limpa(b.nome, 60), fone = fone11(b.fone);

@@ -1,6 +1,7 @@
-import { index, mesesPrefixos, spNow, INATIVO, send } from "../lib/core.js";
+import { temArmazenamento, SEM_ARMAZENAMENTO, index, mesesPrefixos, spNow, INATIVO, send } from "../lib/core.js";
 // Horários ocupados (sem dados pessoais) para o app do cliente.
 export default async function handler(req, res) {
+  if (!temArmazenamento()) return send(res, 200, { dias: {}, aviso: "sem-armazenamento" });
   try {
     const hoje = spNow().date, dias = {};
     for (const it of await index({ prefixes: mesesPrefixos() })) {
