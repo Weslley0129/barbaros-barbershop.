@@ -85,6 +85,21 @@ export default async function handler(req, res) {
       for (const p of alvo) await remove(p);
       return send(res, 200, { ok: true, apagados: alvo.length });
     }
+    if (b.action === "limpar") {
+      // Limpa vários agendamentos de uma vez (o painel escolhe quais: um dia, os que já passaram, cancelados/faltas ou tudo).
+      const ids = new Set((Array.isArray(b.ids) ? b.ids : []).map(String).filter(x => /^[A-Z0-9]{5,12}$/.test(x)).slice(0, 2000));
+      if (!ids.size) return send(res, 400, { erro: "Nada para limpar." });
+      const [items, st, pg, lb] = await Promise.all([index(), listAll("st/"), listAll("pago/"), listAll("lemb/")]);
+      const idDe = (p, rx) => (p.match(rx) || [])[1];
+      const alvo = [
+        ...items.filter(x => ids.has(x.id)).map(x => x.path),
+        ...st.map(x => x.pathname).filter(p => ids.has(idDe(p, /^st\/([A-Z0-9]+)\//))),
+        ...pg.map(x => x.pathname).filter(p => ids.has(idDe(p, /^pago\/([A-Z0-9]+)\.json$/))),
+        ...lb.map(x => x.pathname).filter(p => ids.has(idDe(p, /^lemb\/([A-Z0-9]+)\.json$/))),
+      ];
+      for (let k = 0; k < alvo.length; k += 25) await Promise.all(alvo.slice(k, k + 25).map(p => remove(p)));
+      return send(res, 200, { ok: true, agendamentos: items.filter(x => ids.has(x.id)).length, arquivos: alvo.length });
+    }
     if (b.action === "sub") {
       if (!subValida(b.sub)) return send(res, 400, { erro: "Inscrição inválida." });
       await putJSON(`subs/admin/${subHash(b.sub)}.json`, b.sub);

@@ -30,7 +30,7 @@
   --gold:#B3B2A9; --gold-2:#F5F4E9; --gold-3:#898576; --gold-ink:#14130E;
   --metal:linear-gradient(105deg,#FCFDF5 0%,#F5F4E9 18%,#898576 21%,#FFFBF2 25%,#E7E5E1 30%,#9B978F 34%,#4D493A 38%,#413627 40%,#9F9F91 45%,#8E8F7F 52%,#72705F 57%,#AAA898 61%,#1B1C13 66%,#777972 70%,#878683 75%,#606271 81%,#A7ABA1 86%,#B3B2A9 100%);
   --chrome-text:linear-gradient(180deg,#FCFDF5 0%,#E7E5E1 30%,#898576 48%,#FFFBF2 58%,#9F9F91 78%,#B3B2A9 100%);
-  --ok:#D9DEE3; --ok-bg:#23262A; --warn:#F0B95A; --warn-bg:#2E2412; --bad:#F07067; --bad-bg:#311715;
+  --ok:#D9DEE3; --ok-bg:#23262A; --warn:#F0B95A; --warn-bg:#2E2412; --bad:#F07067; --bad-bg:#311715; --info:#8CC4F5; --info-bg:#132331;
   --wa:#25D366; --wa-ink:#062611;
   --display:"Cinzel","Trajan Pro",Georgia,serif;
   --body:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -227,7 +227,7 @@ h3{font-size:16px;font-weight:700}
 .datebox b{color:var(--gold-2)}
 .datebox small{font-size:10.5px;text-transform:uppercase;color:var(--gold);letter-spacing:.08em;font-weight:700}
 .pill{display:inline-flex;align-items:center;font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.03em}
-.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.mute{background:var(--surface-2);color:var(--muted)}
+.pill.info{background:var(--info-bg);color:var(--info)} .pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.mute{background:var(--surface-2);color:var(--muted)}
 .empty{text-align:center;color:var(--muted);padding:28px 12px;display:flex;flex-direction:column;gap:12px;align-items:center}
 
 /* portfolio */
@@ -267,12 +267,39 @@ details summary{cursor:pointer;color:var(--gold-2);font-weight:700}
 .phead div{display:flex;flex-direction:column;gap:2px}.phead b{font-size:20px;font-family:var(--serif,inherit)}
 .modebar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface-2);font-size:13px}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpis4{grid-template-columns:repeat(2,1fr)}
+.filtro{display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface)}
+.filtro select{flex:1;min-width:0;background:transparent;border:0;color:var(--text);font:inherit;font-weight:700;padding:13px 0;outline:none}
+.filtro select option{background:#141518;color:#eee}
+.pills{display:inline-flex;gap:6px;flex:none}
+.hr .dt{display:block;font-size:10.5px;color:var(--muted);margin-bottom:2px}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.chip{flex:none;padding:8px 14px;border-radius:99px;border:1px solid var(--line-2);background:var(--surface);color:var(--muted);font:inherit;font-size:13px;font-weight:700}
+.chip[aria-pressed="true"]{background:var(--surface-2);color:var(--text);border-color:var(--gold-2)}
+.dtiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:420px){.dtiles{grid-template-columns:repeat(3,1fr)}}
+.dtile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.dtile:hover{border-color:var(--gold-2)}
+.dtile b{font-size:28px;line-height:1;color:var(--text)}
+.vbars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:150px;align-items:end}
+.vb{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:12px;color:var(--text)}
+.vb i{display:block;width:70%;max-width:28px;border-radius:4px 4px 0 0;background:var(--gold-2);transition:opacity .15s}
+.vb:hover i{opacity:.75}
+.vb small{color:var(--muted);font-size:10.5px;white-space:nowrap}
+.hb{display:grid;grid-template-columns:minmax(0,1.3fr) 2fr auto;gap:10px;align-items:center;font-size:13px}
+.hb-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-t{height:10px;border-radius:0 4px 4px 0;background:transparent}
+.hb-t i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--gold-2)}
+.limpa-op{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface);color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.limpa-op div{display:flex;flex-direction:column;gap:2px}
+.limpa-op:disabled{opacity:.45;cursor:default}
+.limpa-op.sel{border-color:var(--bad)}
 .kpi{padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
 .kpi b{display:block;font-size:20px;font-variant-numeric:tabular-nums;color:var(--gold-2)}
 .kpi span{font-size:11.5px;color:var(--muted)}
 .tl{display:flex;flex-direction:column;gap:8px}
 .ag{display:grid;grid-template-columns:58px 1fr;gap:12px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--gold)}
-.ag.st-concluido{border-left-color:var(--ok)} .ag.st-cancelado,.ag.st-faltou{border-left-color:var(--bad);opacity:.7} .ag.st-pendente{border-left-color:var(--warn)}
+.ag.st-atendendo{border-left-color:var(--info)} .ag.st-concluido{border-left-color:var(--ok)} .ag.st-cancelado,.ag.st-faltou{border-left-color:var(--bad);opacity:.7} .ag.st-pendente{border-left-color:var(--warn)}
 .ag .hr{font-weight:800;font-variant-numeric:tabular-nums;font-size:16px}
 .ag .hr small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
 .ag .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
@@ -350,7 +377,7 @@ const PF_CATS=[{id:"todos",nome:"Todos"},{id:"cortes",nome:"Cortes"},{id:"barba"
 const BARB_PADRAO=[{id:"b1",nome:"Barbeiro titular"}];
 
 /* ======= utilidades ======= */
-const ICON={pin:'<path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',nav:'<path d="M3 11l18-8-8 18-2-8-8-2z"/>',
+const ICON={chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',pin:'<path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',nav:'<path d="M3 11l18-8-8 18-2-8-8-2z"/>',
   home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   scis:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/>',
   cal:'<rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
@@ -453,7 +480,7 @@ const S={
   meus:store.get("meus",[]),
   // admin / nuvem
   db:null, user:null, isAdmin:false, cfg:{barbeiros:BARB_PADRAO,pixChave:LOJA.pixChave,endereco:LOJA.endereco}, busy:{},
-  agenda:[], clientes:{}, aTab:"agenda", aDay:iso(new Date()), aView:"dia", cloud:"off",
+  agenda:[], clientes:{}, aTab:"agenda", aFiltro:"todos", dPer:"7", aDay:iso(new Date()), aView:"dia", cloud:"off",
   pin:store.get("pin",""), auth:"nao", inst:null, qcli:"", cbServer:null, enviando:false,
 };
 const barbs=()=>S.cfg.barbeiros&&S.cfg.barbeiros.length?S.cfg.barbeiros:BARB_PADRAO;
@@ -622,12 +649,12 @@ function Feito(){
     <button class="btn btn-ghost" data-copy="${esc(msgAgendamento(b))}" data-msg="Mensagem copiada">${ic("copy")} Copiar mensagem</button></div>
     <button class="link" data-novo>Fazer outro agendamento</button></div></section>`;
 }
-function bkStatus(b){const t=new Date(b.data+"T"+b.hora),now=new Date();if(b.status==="cancelado")return["Cancelado","bad"];if(b.status==="faltou")return["Não compareceu","bad"];if(b.status==="concluido")return["Realizado","mute"];if(b.status==="confirmado")return t<now?["Realizado","mute"]:["Confirmado","ok"];if(t<now)return["Realizado","mute"];return["Aguardando confirmação","warn"]}
+function bkStatus(b){const t=new Date(b.data+"T"+b.hora),now=new Date();if(b.status==="cancelado")return["Cancelado","bad"];if(b.status==="faltou")return["Não compareceu","bad"];if(b.status==="concluido")return["Realizado","mute"];if(b.status==="atendendo")return["Em atendimento","ok"];if(b.status==="confirmado")return t<now?["Realizado","mute"]:["Confirmado","ok"];if(t<now)return["Realizado","mute"];return["Aguardando confirmação","warn"]}
 function Conta(){
   const now=new Date();
   const prox=S.meus.filter(b=>b.status!=="cancelado"&&new Date(b.data+"T"+b.hora)>=now).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora));
   const hist=S.meus.filter(b=>!prox.includes(b)).sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));
-  const card=b=>{const d=fromIso(b.data),[lbl,cls]=bkStatus(b),mins=(new Date(b.data+"T"+b.hora)-now)/60000,podeCancel=!["cancelado","faltou","concluido"].includes(b.status)&&mins>=LOJA.cancelarAteMin;
+  const card=b=>{const d=fromIso(b.data),[lbl,cls]=bkStatus(b),mins=(new Date(b.data+"T"+b.hora)-now)/60000,podeCancel=!["cancelado","faltou","concluido","atendendo"].includes(b.status)&&mins>=LOJA.cancelarAteMin;
     return `<div class="card bk"><div class="when"><div class="datebox"><small>${MES[d.getMonth()]}</small><b>${d.getDate()}</b></div><div style="flex:1;min-width:0"><b>${esc(b.servicos.join(" + "))}</b><div class="small num">${DOW[d.getDay()]} · ${b.hora}–${hm(toMin(b.hora)+b.min)} · ${b.pay==="app"?"Pix pelo app":"na barbearia"}</div></div></div>
     <div class="between"><span class="pill ${cls}">${lbl}</span><span class="price">${brl(b.preco-(b.cbUsado||0))}</span></div>
     ${prox.includes(b)?`<div class="row" style="flex-wrap:wrap">${b.pay==="app"?`<button class="btn btn-gold btn-sm" data-pix="${b.id}">${ic("coin")} Pagar Pix</button>`:""}<a class="btn btn-line btn-sm" href="${gcal(b)}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>${podeCancel?`<button class="btn btn-danger btn-sm" data-cancel="${b.id}">Cancelar</button>`:`<span class="tiny">Cancelamento só até ${LOJA.cancelarAteMin} min antes. Fale no WhatsApp.</span>`}</div>`:""}</div>`};
@@ -668,38 +695,104 @@ function Barbeiro(){
 }
 
 /* ======= painel do barbeiro ======= */
-const ST={pendente:["A confirmar","warn"],confirmado:["Confirmado","ok"],concluido:["Concluído","ok"],cancelado:["Cancelado","bad"],faltou:["Faltou","bad"]};
+const ST={pendente:["A confirmar","warn"],confirmado:["Confirmado","ok"],atendendo:["Em atendimento","info"],concluido:["Concluído","ok"],cancelado:["Cancelado","bad"],faltou:["Faltou","bad"]};
+const FILTROS=[["todos","Todos os clientes"],["pendente","A confirmar"],["confirmado","Confirmado"],["atendendo","Em atendimento"],["remarcado","Remarcados"],["faltou","Falta"]];
+const casaFiltro=(a,f)=>f==="todos"||(f==="remarcado"?!!a.remarcadoEm:a.status===f);
+function agRow(a,comData){
+  const [l,c]=ST[a.status]||ST.pendente; const bn=barbs().find(b=>b.id===a.barb)?.nome||"Qualquer";
+  return `<div class="ag st-${a.status}"><div class="hr">${comData?`<small class="dt">${DOWS[fromIso(a.data).getDay()]} ${br(a.data).slice(0,5)}</small>`:""}${a.hora}<small>${hm(toMin(a.hora)+a.min)}</small></div><div style="min-width:0">
+      <div class="between"><b>${esc(a.nome)}</b><span class="pills">${a.remarcadoEm?`<span class="pill mute">Remarcado</span>`:""}<span class="pill ${c}">${l}</span></span></div>
+      <div class="small">${esc(a.servicos.join(" + "))} · ${brl(a.preco-(a.cbUsado||0))}${barbs().length>1?" · "+esc(bn):""}</div>
+      <div class="tiny">${a.pay==="app"?(a.pago?"Pago pelo app ✓":"Pix pelo app · aguardando"):"Paga na barbearia"}${a.cbUsado?" · usou "+brl(a.cbUsado)+" de cashback":""}</div>
+      <div class="acts">
+        ${a.status==="pendente"?`<button class="btn btn-gold btn-sm" data-ast="confirmado" data-id="${a.id}">Confirmar</button>`:""}
+        ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-line btn-sm" data-ast="atendendo" data-id="${a.id}">${ic("scis")} Iniciar atendimento</button>`:""}
+        ${["pendente","confirmado","atendendo"].includes(a.status)?`<button class="btn ${a.status==="atendendo"?"btn-gold":"btn-line"} btn-sm" data-ast="concluido" data-id="${a.id}">Concluir</button>`:""}
+        ${a.pay==="app"&&!a.pago?`<button class="btn btn-line btn-sm" data-pix="${a.id}">${ic("coin")} QR Pix</button><button class="btn btn-line btn-sm" data-apago="${a.id}">Marcar pago</button>`:""}
+        ${a.fone&&a.status!=="atendendo"?`<a class="btn btn-wa btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>`:""}
+        ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-ghost btn-sm" data-ast="faltou" data-id="${a.id}">Faltou</button><button class="btn btn-ghost btn-sm" data-ast="cancelado" data-id="${a.id}">Cancelar</button>`:""}
+        ${APP==="adminweb"&&["pendente","confirmado","faltou"].includes(a.status)?`<button class="btn btn-line btn-sm" data-remarcar="${a.id}">${ic("cal")} Remarcar</button>`:""}
+        ${APP==="adminweb"&&a.status==="cancelado"?`<button class="btn btn-ghost btn-sm" data-apagar="${a.id}">Apagar</button>`:""}
+      </div></div></div>`;
+}
+function filtroSelect(){
+  const n=f=>S.agenda.filter(a=>casaFiltro(a,f)).length;
+  return `<label class="filtro">${ic("user",'style="width:18px;height:18px;color:var(--muted);flex:none"')}<select id="afiltro" aria-label="Filtrar agenda">${FILTROS.map(([v,l])=>`<option value="${v}" ${S.aFiltro===v?"selected":""}>${l}${v==="todos"?"":" ("+n(v)+")"}</option>`).join("")}</select></label>`;
+}
 function PainelAgenda(){
-  const day=S.aDay, d=fromIso(day);
+  const day=S.aDay, d=fromIso(day), filtro=S.aFiltro||"todos";
   const items=S.agenda.filter(a=>a.data===day).sort((a,b)=>a.hora.localeCompare(b.hora));
   const ativos=items.filter(a=>!["cancelado","faltou"].includes(a.status));
   const fat=ativos.reduce((s,a)=>s+(a.preco-(a.cbUsado||0)),0);
   const strip=[];const base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-1);
   for(let k=0;k<15;k++){const x=new Date(base);x.setDate(base.getDate()+k);strip.push(x)}
-  let rows="",lunchShown=false;
-  for(const a of items){ if(!lunchShown&&toMin(a.hora)>=LOJA.almoco[1]){rows+=`<div class="lunch">Almoço 12:30–13:30</div>`;lunchShown=true}
-    const [l,c]=ST[a.status]||ST.pendente; const bn=barbs().find(b=>b.id===a.barb)?.nome||"Qualquer";
-    rows+=`<div class="ag st-${a.status}"><div class="hr">${a.hora}<small>${hm(toMin(a.hora)+a.min)}</small></div><div style="min-width:0">
-      <div class="between"><b>${esc(a.nome)}</b><span class="pill ${c}">${l}</span></div>
-      <div class="small">${esc(a.servicos.join(" + "))} · ${brl(a.preco-(a.cbUsado||0))}${barbs().length>1?" · "+esc(bn):""}</div>
-      <div class="tiny">${a.pay==="app"?(a.pago?"Pago pelo app ✓":"Pix pelo app · aguardando"):"Paga na barbearia"}${a.cbUsado?" · usou "+brl(a.cbUsado)+" de cashback":""}</div>
-      <div class="acts">
-        ${a.status==="pendente"?`<button class="btn btn-gold btn-sm" data-ast="confirmado" data-id="${a.id}">Confirmar</button>`:""}
-        ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-line btn-sm" data-ast="concluido" data-id="${a.id}">Concluir</button>`:""}
-        ${a.pay==="app"&&!a.pago?`<button class="btn btn-line btn-sm" data-pix="${a.id}">${ic("coin")} QR Pix</button><button class="btn btn-line btn-sm" data-apago="${a.id}">Marcar pago</button>`:""}
-        ${a.fone?`<a class="btn btn-wa btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>`:""}
-        ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-ghost btn-sm" data-ast="faltou" data-id="${a.id}">Faltou</button><button class="btn btn-ghost btn-sm" data-ast="cancelado" data-id="${a.id}">Cancelar</button>`:""}
-        ${APP==="adminweb"&&["pendente","confirmado","faltou"].includes(a.status)?`<button class="btn btn-line btn-sm" data-remarcar="${a.id}">${ic("cal")} Remarcar</button>`:""}
-        ${APP==="adminweb"&&a.status==="cancelado"?`<button class="btn btn-ghost btn-sm" data-apagar="${a.id}">Apagar</button>`:""}
-      </div></div></div>`;}
-  if(!items.length) rows=`<div class="card empty"><span>${lojaAberta(d)?"Nenhum horário marcado neste dia.":"Barbearia fechada neste dia."}</span></div>`;
+  let rows="",titulo;
+  if(filtro==="todos"){
+    let lunchShown=false;
+    for(const a of items){ if(!lunchShown&&toMin(a.hora)>=LOJA.almoco[1]){rows+=`<div class="lunch">Almoço 12:30–13:30</div>`;lunchShown=true} rows+=agRow(a)}
+    if(!items.length) rows=`<div class="card empty"><span>${lojaAberta(d)?"Nenhum horário marcado neste dia.":"Barbearia fechada neste dia."}</span></div>`;
+    titulo=`${DOW[d.getDay()]}, ${br(day)}`;
+  }else{
+    const hoje=iso(new Date());
+    const lista=S.agenda.filter(a=>casaFiltro(a,filtro));
+    const prox=lista.filter(a=>a.data>=hoje).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora));
+    const pass=lista.filter(a=>a.data<hoje).sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));
+    rows=prox.map(a=>agRow(a,true)).join("")+(pass.length?`<div class="lunch">Dias anteriores</div>`+pass.map(a=>agRow(a,true)).join(""):"");
+    if(!lista.length) rows=`<div class="card empty"><span>Nenhum agendamento em “${FILTROS.find(f=>f[0]===filtro)[1]}”.</span></div>`;
+    titulo=`${FILTROS.find(f=>f[0]===filtro)[1]} · ${lista.length}`;
+  }
   const amanha=new Date();amanha.setDate(amanha.getDate()+1);const amanhaIso=iso(amanha);
   const lemb=S.agenda.filter(a=>a.data===amanhaIso&&["pendente","confirmado"].includes(a.status)&&a.fone);
-  return `<div class="days">${strip.map(x=>`<button class="day ${day===iso(x)?"sel":""}" data-aday="${iso(x)}"><small>${DOWS[x.getDay()]}</small><b>${x.getDate()}</b><i>${lojaAberta(x)?S.agenda.filter(a=>a.data===iso(x)&&!["cancelado","faltou"].includes(a.status)).length+" ag.":"fechado"}</i></button>`).join("")}</div>
+  return `${filtroSelect()}
+  ${filtro==="todos"?`<div class="days">${strip.map(x=>`<button class="day ${day===iso(x)?"sel":""}" data-aday="${iso(x)}"><small>${DOWS[x.getDay()]}</small><b>${x.getDate()}</b><i>${lojaAberta(x)?S.agenda.filter(a=>a.data===iso(x)&&!["cancelado","faltou"].includes(a.status)).length+" ag.":"fechado"}</i></button>`).join("")}</div>
   <div class="kpis"><div class="kpi"><b>${ativos.length}</b><span>atendimentos</span></div><div class="kpi"><b class="num" style="font-size:16px">${brl(fat)}</b><span>previsto</span></div><div class="kpi"><b>${items.filter(a=>a.status==="pendente").length}</b><span>a confirmar</span></div></div>
-  ${lemb.length?`<div class="card pad stack"><div class="between"><h3>${ic("bell",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} Lembretes de amanhã</h3><span class="pill warn">${lemb.length}</span></div><p class="tiny" style="margin:0">Um toque abre o WhatsApp do cliente com a mensagem pronta.</p>${lemb.map(a=>`<a class="btn btn-line btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${a.hora} · ${esc(a.nome)}</a>`).join("")}</div>`:""}
-  <div class="between"><h2>${DOW[d.getDay()]}, ${br(day)}</h2><button class="btn btn-gold btn-sm" data-novoag>${ic("plus")} Novo</button></div>
+  ${lemb.length?`<div class="card pad stack"><div class="between"><h3>${ic("bell",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} Lembretes de amanhã</h3><span class="pill warn">${lemb.length}</span></div><p class="tiny" style="margin:0">Um toque abre o WhatsApp do cliente com a mensagem pronta.</p>${lemb.map(a=>`<a class="btn btn-line btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${a.hora} · ${esc(a.nome)}</a>`).join("")}</div>`:""}`:""}
+  <div class="stack" style="gap:10px"><h2>${titulo}</h2><div class="row" style="gap:8px">${APP==="adminweb"?`<button class="btn btn-ghost btn-sm" style="flex:1" data-limpar>${ic("trash")} Limpar agenda</button>`:""}<button class="btn btn-gold btn-sm" style="flex:1" data-novoag>${ic("plus")} Novo agendamento</button></div></div>
   <div class="tl">${rows}</div>`;
+}
+function LimparSheet(){
+  const hoje=iso(new Date()),dia=S.aDay;
+  const g={dia:S.agenda.filter(a=>a.data===dia),passados:S.agenda.filter(a=>a.data<hoje),inativos:S.agenda.filter(a=>["cancelado","faltou"].includes(a.status)),tudo:S.agenda};
+  const op=(k,t,sub)=>`<button class="limpa-op" data-limpaop="${k}" ${g[k].length?"":"disabled"}><div><b>${t}</b><span class="tiny">${sub}</span></div><span class="pill ${k==="tudo"?"bad":"mute"}">${g[k].length}</span></button>`;
+  return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Limpar agenda"><div class="stack">
+    <div class="between"><div><span class="eyebrow">Agenda</span><h2 style="margin-top:4px">Limpar agenda</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <p class="small" style="margin:0">Escolha o que apagar. Apagar não avisa o cliente e não tem como desfazer.</p>
+    ${op("dia",`Só ${DOW[fromIso(dia).getDay()]}, ${br(dia)}`,"Todos os horários do dia selecionado")}
+    ${op("passados","Dias que já passaram","Tudo antes de hoje, inclusive concluídos")}
+    ${op("inativos","Cancelados e faltas","De todos os dias")}
+    ${op("tudo","Toda a agenda","Apaga tudo, inclusive o histórico e o cashback dos clientes")}
+    <div id="limpaconf"></div><span class="err" id="limpaerr"></span></div></div></div>`;
+}
+function limparIds(k){const hoje=iso(new Date());return S.agenda.filter(a=>k==="dia"?a.data===S.aDay:k==="passados"?a.data<hoje:k==="inativos"?["cancelado","faltou"].includes(a.status):true).map(a=>a.id)}
+const LIMPA_TXT={dia:"o dia selecionado",passados:"os dias que já passaram",inativos:"os cancelados e faltas",tudo:"TODA a agenda"};
+/* ======= dashboard ======= */
+function PainelDash(){
+  const hoje=new Date();hoje.setHours(0,0,0,0);const H=iso(hoje);
+  const add=n=>{const x=new Date(hoje);x.setDate(x.getDate()+n);return iso(x)};
+  const PER=[["hoje","Hoje",H,H],["7","Próx. 7 dias",H,add(6)],["30","Últimos 30 dias",add(-29),H],["tudo","Tudo","0000","9999"]];
+  const [,perNome,ini,fim]=PER.find(p=>p[0]===S.dPer)||PER[1];
+  const L=S.agenda.filter(a=>a.data>=ini&&a.data<=fim);
+  const n=f=>L.filter(a=>casaFiltro(a,f)).length;
+  const val=a=>(a.preco||0)-(a.cbUsado||0);
+  const conc=L.filter(a=>a.status==="concluido"),prev=L.filter(a=>["pendente","confirmado","atendendo"].includes(a.status));
+  const faltas=n("faltou"),base=conc.length+faltas;
+  const tiles=[["todos","Todos os clientes","mute"],["pendente","A confirmar","warn"],["confirmado","Confirmado","ok"],["atendendo","Em atendimento","info"],["remarcado","Remarcados","mute"],["faltou","Falta","bad"]];
+  // agendamentos por dia (próximos 7 dias abertos)
+  const dias=[];for(let k=0;dias.length<7&&k<14;k++){const x=new Date(hoje);x.setDate(x.getDate()+k);if(lojaAberta(x))dias.push(x)}
+  const porDia=dias.map(x=>({x,q:S.agenda.filter(a=>a.data===iso(x)&&!["cancelado","faltou"].includes(a.status)).length}));
+  const mx=Math.max(1,...porDia.map(d=>d.q));
+  // serviços mais pedidos no período
+  const sv={};for(const a of L.filter(a=>a.status!=="cancelado"))for(const nm of a.servicos||[])sv[nm]=(sv[nm]||0)+1;
+  const top=Object.entries(sv).sort((a,b)=>b[1]-a[1]).slice(0,5),mxs=Math.max(1,...top.map(t=>t[1]));
+  const clientes=new Set(L.map(a=>digits(a.fone).slice(-11)||a.nome)).size;
+  return `<div class="chips" role="group" aria-label="Período">${PER.map(([k,l])=>`<button class="chip" data-dper="${k}" aria-pressed="${S.dPer===k}">${l}</button>`).join("")}</div>
+  <div class="dtiles">${tiles.map(([k,l,c])=>`<button class="dtile" data-dfiltro="${k}" title="Ver na agenda"><span class="pill ${c}">${l}</span><b class="num">${n(k)}</b><span class="tiny">ver na agenda ${ic("r",'style="width:12px;height:12px;vertical-align:-2px"')}</span></button>`).join("")}</div>
+  <div class="kpis kpis4"><div class="kpi"><b class="num" style="font-size:16px">${brl(conc.reduce((s,a)=>s+val(a),0))}</b><span>faturado (concluídos)</span></div><div class="kpi"><b class="num" style="font-size:16px">${brl(prev.reduce((s,a)=>s+val(a),0))}</b><span>previsto</span></div><div class="kpi"><b class="num">${conc.length?brl(conc.reduce((s,a)=>s+val(a),0)/conc.length):"—"}</b><span>ticket médio</span></div><div class="kpi"><b class="num">${base?Math.round(faltas/base*100)+"%":"—"}</b><span>taxa de faltas</span></div></div>
+  <div class="card pad stack"><div class="between"><h3>Agendamentos por dia</h3><span class="tiny">próximos dias</span></div>
+    <div class="vbars" role="img" aria-label="${porDia.map(d=>DOWS[d.x.getDay()]+" "+d.x.getDate()+": "+d.q).join(", ")}">${porDia.map(d=>`<div class="vb" title="${DOW[d.x.getDay()]}, ${br(iso(d.x))}: ${d.q} agendamento${d.q===1?"":"s"}"><span class="num">${d.q}</span><i style="height:${Math.max(d.q?8:2,Math.round(d.q/mx*100))}%"></i><small>${DOWS[d.x.getDay()]} ${d.x.getDate()}</small></div>`).join("")}</div></div>
+  <div class="card pad stack"><div class="between"><h3>Serviços mais pedidos</h3><span class="tiny">${perNome.toLowerCase()}</span></div>
+    ${top.length?top.map(([nm,q])=>`<div class="hb" title="${esc(nm)}: ${q}"><span class="hb-l">${esc(nm)}</span><span class="hb-t"><i style="width:${Math.round(q/mxs*100)}%"></i></span><b class="num">${q}</b></div>`).join(""):`<p class="tiny" style="margin:0">Sem agendamentos neste período.</p>`}</div>
+  <div class="kpis"><div class="kpi"><b class="num">${clientes}</b><span>clientes no período</span></div><div class="kpi"><b class="num">${n("concluido")||conc.length}</b><span>concluídos</span></div><div class="kpi"><b class="num">${S.inst?S.inst.app:"—"}</b><span>apps instalados</span></div></div>`;
 }
 function lembrete(a){return `Fala, ${a.nome.split(" ")[0]}! Passando pra lembrar do seu horário na ${LOJA.nome}: ${DOW[fromIso(a.data).getDay()]}, ${br(a.data)} às ${a.hora} (${a.servicos.join(" + ")}). Se precisar cancelar, avisa até 30 min antes. Tamo junto!`}
 function PainelClientes(){
@@ -739,7 +832,7 @@ function PainelAjustes(){
   <div class="card pad stack"><h3>Regras da agenda</h3><ul class="rules"><li>Ter a sáb, 9h–19h, almoço 12h30–13h30</li><li>Antecedência mínima de 1h · cancelamento até 30 min antes</li><li>Cashback de 5% em pagamentos pelo app</li></ul></div>`;
 }
 function Painel(){
-  const tabsA={agenda:PainelAgenda,clientes:PainelClientes,ajustes:PainelAjustes};
+  const tabsA={agenda:PainelAgenda,dash:PainelDash,clientes:PainelClientes,ajustes:PainelAjustes};
   return `<section class="screen"><div class="phead"><img src="${LOGO_SRC()}" alt="" width="52" height="52"><div><span class="eyebrow">Bárbaros Barbershop</span><b>Meu painel</b></div></div><div class="modebar"><span>${ic("scis",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} <b>Painel do Barbeiro</b> · ${S.cloud==="on"?"ao vivo":S.cloud==="erro"?"sem conexão":"conectando…"}</span>${APP==="adminweb"?`<button class="link" data-recarregar>Atualizar ${ic("back",'style="width:14px;height:14px"')}</button>`:`<a class="link" href="${URL_CLIENTE}" target="_blank" rel="noopener">App do cliente ${ic("r",'style="width:14px;height:14px"')}</a>`}</div>
   ${APP==="adminweb"&&S.aviso?`<div class="note"><b>Agenda online desativada.</b> ${esc(S.aviso)} Até ativar, os pedidos dos clientes chegam só pelo WhatsApp.</div>`:""}
   ${tabsA[S.aTab]()}</section>`;
@@ -803,20 +896,20 @@ function Instalar(){
 }
 /* ======= render ======= */
 const TABS_C=[["inicio","Início","home"],["servicos","Serviços","scis"],["agendar","Agendar","cal"],["portfolio","Portfólio","gal"],["conta","Conta","user"]];
-const TABS_A=[["agenda","Agenda","cal"],["clientes","Clientes","crown"],["ajustes","Ajustes","gear"]];
+const TABS_A=[["agenda","Agenda","cal"],["dash","Dashboard","chart"],["clientes","Clientes","crown"],["ajustes","Ajustes","gear"]];
 let ULTIMA_TELA="";
 function render(){
   const app=document.getElementById("app"),ae=document.activeElement,fid=ae&&ae.id,pos=ae&&ae.selectionStart,y=window.scrollY;
   const tela=APP==="adminweb"?(S.auth==="ok"?"a:"+S.aTab:"login"):APP==="admin"?"a:"+S.aTab:"c:"+S.tab+":"+(S.tab==="agendar"?(S.done?"ok":S.step):"");
   if(APP==="adminweb"&&S.auth!=="ok"){app.innerHTML=Login();document.getElementById("tabs").innerHTML="";document.getElementById("cartbar").innerHTML="";}
   else if(APP==="adminweb"){app.innerHTML=Painel();
-    document.getElementById("tabs").style.gridTemplateColumns="repeat(3,1fr)";
+    document.getElementById("tabs").style.gridTemplateColumns="repeat("+TABS_A.length+",1fr)";
     document.getElementById("tabs").innerHTML=TABS_A.map(([id,l,i])=>`<button class="tab" data-atab="${id}" ${S.aTab===id?'aria-current="page"':""}><span class="ti">${ic(i)}</span>${l}</button>`).join("");
     document.getElementById("cartbar").innerHTML="";
   }
   else if(APP==="admin"&&!S.isAdmin){app.innerHTML=Bloqueado();document.getElementById("tabs").innerHTML="";document.getElementById("cartbar").innerHTML="";}
   else if(APP==="admin"){app.innerHTML=Painel();
-    document.getElementById("tabs").style.gridTemplateColumns="repeat(3,1fr)";
+    document.getElementById("tabs").style.gridTemplateColumns="repeat("+TABS_A.length+",1fr)";
     document.getElementById("tabs").innerHTML=TABS_A.map(([id,l,i])=>`<button class="tab" data-atab="${id}" ${S.aTab===id?'aria-current="page"':""}><span class="ti">${ic(i)}</span>${l}</button>`).join("");
     document.getElementById("cartbar").innerHTML="";
   }else{
@@ -1088,7 +1181,18 @@ document.addEventListener("click",async e=>{
   if(d.lbgo!==undefined){LB=null;S.tab="agendar";S.done=null;render();window.scrollTo({top:0});return}
   // admin
   if(d.mode){S.mode=d.mode;render();window.scrollTo({top:0});return}
-  if(d.atab){S.aTab=d.atab;render();return}
+  if(d.atab){S.aTab=d.atab;render();window.scrollTo({top:0});return}
+  if(d.dper){S.dPer=d.dper;render();return}
+  if(d.dfiltro){S.aFiltro=d.dfiltro;S.aTab="agenda";render();window.scrollTo({top:0});return}
+  if(d.limpar!==undefined){S.sheet=LimparSheet();drawOverlay();return}
+  if(d.limpaop){document.querySelectorAll(".limpa-op").forEach(b=>b.classList.toggle("sel",b===t));const ids=limparIds(d.limpaop),c=document.getElementById("limpaconf");
+    c.innerHTML=`<div class="stack"><div class="note">Vai apagar ${ids.length} agendamento${ids.length===1?"":"s"} (${LIMPA_TXT[d.limpaop]}).</div>${d.limpaop==="tudo"?`<div class="field"><label class="small" for="limpatxt">Para confirmar, digite LIMPAR</label><input id="limpatxt" autocomplete="off" autocapitalize="characters"></div>`:""}<button class="btn btn-danger" data-limpaok="${d.limpaop}">${ic("trash")} Apagar ${ids.length}</button></div>`;return}
+  if(d.limpaok){const k=d.limpaok,err=document.getElementById("limpaerr");
+    if(k==="tudo"&&(document.getElementById("limpatxt")?.value||"").trim().toUpperCase()!=="LIMPAR"){err.textContent="Digite LIMPAR para confirmar.";return}
+    const ids=limparIds(k);if(!ids.length)return;t.disabled=true;err.textContent="";
+    try{const r=await adm({action:"limpar",ids});const set=new Set(ids);S.agenda=S.agenda.filter(a=>!set.has(a.id));ids.forEach(id=>delete BK[id]);store.set("bkcache",BK);
+      S.sheet=null;drawOverlay();toast(r.agendamentos+" agendamento"+(r.agendamentos===1?"":"s")+" apagado"+(r.agendamentos===1?"":"s"));render()}
+    catch(x){t.disabled=false;err.textContent=x.message||"Não foi possível limpar."}return}
   if(d.aday){S.aDay=d.aday;render();return}
   if(d.ast){setStatus(d.id,d.ast);return}
   if(d.apago&&APP==="adminweb"){try{await adm({action:"pago",id:d.apago});const a=S.agenda.find(x=>x.id===d.apago);if(a)a.pago=true;toast("Pagamento registrado");render()}catch(err){toast("Não foi possível salvar.")}return}
@@ -1098,7 +1202,7 @@ document.addEventListener("click",async e=>{
   if(d.rmsalvar){const a=S.agenda.find(x=>x.id===d.rmsalvar);if(!a)return;const hora=document.getElementById("rmhora").value,data=d.dia,err=document.getElementById("rmerr");
     if(data===a.data&&hora===a.hora){err.textContent="Escolha um dia ou horário diferente do atual.";return}
     t.disabled=true;try{const r=await adm({action:"remarcar",id:a.id,data,hora,forcar:!!d.forcar});
-      a.data=data;a.hora=hora;if(a.status!=="confirmado")a.status="confirmado";if(BK[a.id]){BK[a.id].data=data;BK[a.id].hora=hora;store.set("bkcache",BK)}
+      const rm=new Date().toISOString();a.data=data;a.hora=hora;a.remarcadoEm=rm;if(a.status!=="confirmado")a.status="confirmado";if(BK[a.id]){BK[a.id].data=data;BK[a.id].hora=hora;BK[a.id].remarcadoEm=rm;store.set("bkcache",BK)}
       S.aDay=data;S.sheet=MsgSheet(a,"remarcado",r.enviados||0);render();drawOverlay();toast("Horário remarcado")}
     catch(x){t.disabled=false;err.textContent=x.message||"Não foi possível remarcar."}return}
   if(d.wamsg){const t2=document.getElementById("msgwa");openLink(waTo("55"+d.wamsg,t2?t2.value:""));S.sheet=null;drawOverlay();toast("WhatsApp aberto com a mensagem");return}
@@ -1129,7 +1233,7 @@ document.addEventListener("click",async e=>{
   if(d.savecfg!==undefined){saveCfg({pixChave:document.getElementById("pix").value.trim(),endereco:document.getElementById("end").value.trim()});return}
 });
 function maskFone(v){v=digits(v).slice(0,11);if(v.length>7)return`(${v.slice(0,2)}) ${v.slice(2,3)} ${v.slice(3,7)}-${v.slice(7)}`;if(v.length>3)return`(${v.slice(0,2)}) ${v.slice(2,3)} ${v.slice(3)}`;if(v.length>2)return`(${v.slice(0,2)}) ${v.slice(2)}`;return v}
-document.addEventListener("change",e=>{if(e.target.id==="rmhora"){const a=S.agenda.find(x=>x.id===e.target.dataset.id);if(a){S.sheet=RemarcarSheet(a,e.target.dataset.dia,e.target.value);drawOverlay()}}});
+document.addEventListener("change",e=>{if(e.target.id==="afiltro"){S.aFiltro=e.target.value;render();return}if(e.target.id==="rmhora"){const a=S.agenda.find(x=>x.id===e.target.dataset.id);if(a){S.sheet=RemarcarSheet(a,e.target.dataset.dia,e.target.value);drawOverlay()}}});
 document.addEventListener("submit",e=>{if(e.target.matches("[data-login]")){e.preventDefault();const v=digits(document.getElementById("pinin").value);if(!v)return;S.pin=v;S.loginErr="";carregaAdmin()}});
 document.addEventListener("input",e=>{const id=e.target.id;
   if(id==="qcli"){S.qcli=e.target.value;render();return}
