@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bárbaros Painel</title>
+<meta name="description" content="Painel do barbeiro da Bárbaros Barbershop.">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="manifest" href="/painel.webmanifest">
+<link rel="icon" href="/icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Bárbaros Painel">
+<meta property="og:title" content="Bárbaros Painel">
+<meta property="og:description" content="Painel do barbeiro da Bárbaros Barbershop.">
+<meta property="og:image" content="/icons/icon-512.png">
+<style>html,body{margin:0;min-height:100%}img{max-width:100%}[hidden]{display:none!important}body{padding-top:env(safe-area-inset-top,0px)}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Archivo:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: phone-width app column on a single, deliberate dark "barber's chair" theme: black leather, brushed gold. Bottom tab bar; barber mode swaps the tabs. */
+:root{
+  --bg:#0A0A0B; --surface:#141517; --surface-2:#1C1D20; --line:#26282B; --line-2:#3F4348;
+  --ink:#F1F3F5; --muted:#A6ACB3; --faint:#767D85;
+  --gold:#B3B2A9; --gold-2:#F5F4E9; --gold-3:#898576; --gold-ink:#14130E;
+  --metal:linear-gradient(105deg,#FCFDF5 0%,#F5F4E9 18%,#898576 21%,#FFFBF2 25%,#E7E5E1 30%,#9B978F 34%,#4D493A 38%,#413627 40%,#9F9F91 45%,#8E8F7F 52%,#72705F 57%,#AAA898 61%,#1B1C13 66%,#777972 70%,#878683 75%,#606271 81%,#A7ABA1 86%,#B3B2A9 100%);
+  --chrome-text:linear-gradient(180deg,#FCFDF5 0%,#E7E5E1 30%,#898576 48%,#FFFBF2 58%,#9F9F91 78%,#B3B2A9 100%);
+  --ok:#D9DEE3; --ok-bg:#23262A; --warn:#F0B95A; --warn-bg:#2E2412; --bad:#F07067; --bad-bg:#311715;
+  --wa:#25D366; --wa-ink:#062611;
+  --display:"Cinzel","Trajan Pro",Georgia,serif;
+  --body:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:16px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:10px}
+.app{max-width:480px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom,0px))}
+.screen{display:flex;flex-direction:column;gap:20px;padding-block:20px 8px}
+.screen.anim{animation:rise .3s ease}
+.srch{display:flex;align-items:center;gap:10px;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface)}
+.srch input{flex:1;min-width:0;border:0;outline:0;background:none;height:44px}
+.cl{width:100%;text-align:left}
+.hist{display:flex;flex-direction:column;gap:8px}
+.hist .it{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.notif{display:flex;gap:12px;align-items:center;padding:14px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface)}
+@keyframes rise{from{transform:translateY(6px)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.15}
+h1{font-family:var(--display);font-weight:600;font-size:27px;letter-spacing:.02em;background:var(--chrome-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:.03em;color:var(--gold-2)}
+h3{font-size:16px;font-weight:700}
+.muted{color:var(--muted)} .small{font-size:13px;color:var(--muted)} .tiny{font-size:12px;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.head{display:flex;flex-direction:column;gap:6px}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.price{font-weight:800;color:var(--gold-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:14px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .12s,filter .12s;text-align:center}
+.btn:active{transform:scale(.98)}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-gold{position:relative;overflow:hidden;background:var(--metal);color:var(--gold-ink);border:1px solid #F7F9FB;box-shadow:0 10px 26px -12px rgba(220,226,232,.7),inset 0 1px 0 #fff,inset 0 -2px 3px rgba(60,66,74,.35);text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.btn-gold::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-20deg);animation:shine 3.6s ease-in-out infinite;pointer-events:none}
+.btn-gold,.day.sel,.slot.sel,.day.sel small,.day.sel i{text-shadow:0 0 3px #fff,0 0 7px rgba(255,255,255,.95),0 0 12px rgba(255,255,255,.7)!important}
+
+/* interação: letras acesas ao passar o cursor / tocar */
+.btn,.tab,.chip,.day,.slot,.svc,.pro,.payopt,.link,.pf,.strip button{transition:color .18s,text-shadow .18s,transform .18s,filter .18s,border-color .18s,box-shadow .18s}
+@media (hover:hover){
+  .btn:not([disabled]):hover{transform:translateY(-1px);filter:brightness(1.06)}
+  .btn-gold:not([disabled]):hover,.day.sel:hover,.slot.sel:hover{color:#fff!important;text-shadow:0 0 1px #000,0 0 2px #000,0 0 3px #000,0 0 10px #fff,0 0 18px #fff,0 0 28px rgba(255,255,255,.9)!important}
+  .btn-gold:not([disabled]):hover::after{animation-duration:1.1s}
+  .btn-line:hover,.btn-ghost:hover,.chip:hover,.tab:hover,.link:hover,.day:not(.sel):not(:disabled):hover,.slot:not(.sel):not(:disabled):hover,.pro:hover,.payopt:hover{color:#fff;text-shadow:0 0 6px rgba(255,255,255,.95),0 0 14px rgba(255,255,255,.7),0 0 24px rgba(245,244,233,.5);border-color:var(--gold-2)}
+  .tab:hover .ti{color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,.9))}
+  .svc:hover{border-color:var(--gold-2);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 22px -6px rgba(255,255,255,.35)}
+  .svc:hover b,.svc:hover .price{color:#fff;text-shadow:0 0 6px rgba(255,255,255,.95),0 0 16px rgba(255,255,255,.6)}
+  .btn-wa:hover,.btn-ig:hover{text-shadow:0 0 6px #fff,0 0 14px rgba(255,255,255,.85)}
+  .pf:hover,.strip button:hover{transform:translateY(-2px);box-shadow:0 0 24px -6px rgba(255,255,255,.4)}
+}
+.btn:not([disabled]):active,.svc:active,.day:not(:disabled):active,.slot:not(:disabled):active{transform:scale(.98);text-shadow:0 0 8px #fff,0 0 16px rgba(255,255,255,.8)}
+@keyframes shine{0%,55%{left:-60%}85%,100%{left:130%}}
+.btn-wa{background:linear-gradient(180deg,#2FE07A,#1EBE5D);color:#fff;border:0;text-shadow:0 1px 2px rgba(0,0,0,.2);box-shadow:0 8px 22px -10px #25D366}
+.btn-ig{background:linear-gradient(45deg,#FEDA75 0%,#FA7E1E 25%,#D62976 50%,#962FBF 75%,#4F5BD5 100%);color:#fff;border:0;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 8px 22px -10px #D62976}
+.btn-line{border:1px solid var(--line-2);background:var(--surface);color:var(--gold-2)}
+.btn-ghost{color:var(--muted)}
+.btn-danger{border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);color:var(--bad);background:var(--bad-bg)}
+.btn-sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:10px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.w100{width:100%}
+.link{color:var(--gold-2);font-weight:700;font-size:13px;text-decoration:none;display:inline-flex;gap:4px;align-items:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.pad{padding:16px}
+
+/* hero */
+.hero{position:relative;margin:-20px -16px 0;display:flex;flex-direction:column;padding:0 16px 4px}
+.hero-img{position:relative;margin:0 -16px;aspect-ratio:896/1200;overflow:hidden}
+.hero-img img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
+.eye{position:absolute;z-index:2;width:5.2%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.6);border-radius:50%;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(circle,#FFE9B8 0%,#FFA62B 20%,rgba(255,96,0,.7) 42%,rgba(230,60,0,.22) 62%,transparent 72%);transition:opacity .35s ease,transform .35s ease}
+.eye.bg{width:9%;opacity:0}
+.hero-img:hover .eye,.hero-img.acesa .eye{opacity:1;transform:translate(-50%,-50%) scale(1);animation:brasa 1.6s ease-in-out infinite}
+.hero-img:hover .eye.bg,.hero-img.acesa .eye.bg{opacity:.85}
+.hero-img:hover img,.hero-img.acesa img{filter:brightness(.92) contrast(1.05)}
+.hero-img img{transition:filter .4s}
+@keyframes brasa{0%,100%{filter:brightness(1)}50%{filter:brightness(1.6) saturate(1.2)}}
+.hero-img::after{content:"";position:absolute;inset:auto 0 0 0;height:12%;background:linear-gradient(to bottom,transparent,var(--bg))}
+.hero .tag{font-size:14px;color:var(--ink);max-width:34ch}
+.hero-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.hero-cta .btn-gold{grid-column:1/-1}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fact{padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.fact b{font-size:15px;font-variant-numeric:tabular-nums;color:var(--gold-2)}
+.fact span{font-size:11.5px;color:var(--muted)}
+.club{position:relative;overflow:hidden;padding:18px;border-radius:18px;border:1px solid var(--line-2);background:
+  radial-gradient(120% 120% at 100% 0%,color-mix(in srgb,var(--gold) 26%,transparent),transparent 55%),var(--surface)}
+.club .big{font-family:var(--display);font-size:34px;color:var(--gold-2);line-height:1}
+
+.strip{display:flex;gap:10px;overflow-x:auto;margin:0 -16px;padding:0 16px 4px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip button{flex:none;width:128px;aspect-ratio:3/4;border-radius:14px;overflow:hidden;scroll-snap-align:start}
+.strip img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* services */
+.svc{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);transition:border-color .15s,background .15s}
+.svc .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.svc .t b{font-weight:700;font-size:15px}
+.svc .meta{font-size:12.5px;color:var(--muted)}
+.svc .note{font-size:12px;color:var(--faint);line-height:1.4}
+.svc .r{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.svc .from{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.svc.on{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 9%,var(--surface))}
+.tick{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:none}
+.tick svg{width:14px;height:14px;opacity:0}
+.svc.on .tick{background:var(--metal);border-color:var(--gold);color:var(--gold-ink)}
+.tick{border-color:var(--gold-3)!important}
+.svc.on .tick svg{opacity:1}
+.combo{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:2px}
+
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);font-size:13.5px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold-2);background:color-mix(in srgb,var(--gold) 10%,var(--surface))}
+
+/* booking */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.steps span{height:4px;border-radius:4px;background:var(--line)}
+.steps span.on{background:var(--gold)}
+.steplbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.steplbl b{color:var(--ink)}
+.sum{position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:5;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--surface-2) 94%,transparent);backdrop-filter:blur(10px);border:1px solid var(--line-2)}
+.sum .l{flex:1;font-size:13px;color:var(--muted);min-width:0}
+.nav{display:flex;gap:10px}
+.nav .btn-gold,.nav .btn-wa{flex:1}
+.lbl{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
+.lbl svg{width:16px;height:16px;color:var(--gold)}
+.pros{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pro{padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--surface);text-align:left;display:flex;flex-direction:column;gap:2px}
+.pro b{font-size:14px}.pro span{font-size:12px;color:var(--muted)}
+.pro[aria-pressed="true"]{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 9%,var(--surface))}
+.days{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.day{flex:none;width:62px;padding:10px 0;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:center;gap:1px}
+.day small{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.day b{font-size:20px;font-variant-numeric:tabular-nums}
+.day i{font-style:normal;font-size:10.5px;color:var(--muted)}
+.day.sel{background:var(--metal);border-color:transparent;color:var(--gold-ink)}
+.day.sel small,.day.sel i{color:var(--gold-ink)}
+.day:disabled{opacity:.35;cursor:default}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.slot{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
+.slot.sel{background:var(--metal);border-color:transparent;color:var(--gold-ink)}
+.slot:disabled{opacity:.28;text-decoration:line-through;cursor:default}
+.period{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-top:4px}
+.pay{display:grid;gap:10px}
+.payopt{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);text-align:left}
+.payopt .rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--line-2);flex:none;margin-top:2px}
+.payopt[aria-pressed="true"]{border-color:var(--gold)}
+.payopt[aria-pressed="true"] .rd{border:6px solid var(--gold)}
+.payopt b{display:block}
+.badge{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--ok-bg);color:var(--ok);margin-left:6px}
+.toggle{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1px dashed var(--line-2)}
+.sw{width:44px;height:26px;border-radius:99px;background:var(--line-2);position:relative;flex:none;transition:.15s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ink);transition:.15s}
+.sw[aria-checked="true"]{background:var(--metal)}
+.sw[aria-checked="true"]::after{left:21px;background:var(--gold-ink)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field input,.field select,.field textarea{min-height:48px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface);padding:0 14px;outline:0;width:100%}
+.field textarea{padding:12px 14px;min-height:120px;resize:vertical;font-size:13px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 25%,transparent)}
+.err{color:var(--bad);font-size:12.5px}
+.receipt{padding:16px}
+.receipt dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:14px}
+.receipt dt{color:var(--muted)} .receipt dd{margin:0;text-align:right;font-weight:600}
+.receipt hr{border:0;border-top:1px dashed var(--line-2);margin:12px 0}
+.total{display:flex;justify-content:space-between;align-items:baseline}
+.total b{font-size:22px;color:var(--gold-2);font-variant-numeric:tabular-nums}
+.note{border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.45;background:var(--warn-bg);color:var(--warn)}
+.note.info{background:var(--surface-2);color:var(--muted)}
+.okc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:24px 18px}
+.okc .ic{width:62px;height:62px;border-radius:50%;background:var(--metal);color:var(--gold-ink);display:grid;place-items:center}
+.okc .ic svg{width:30px;height:30px}
+
+/* my bookings */
+.bk{padding:14px;display:flex;flex-direction:column;gap:10px}
+.bk .when{display:flex;gap:12px;align-items:center}
+.datebox{width:54px;flex:none;text-align:center;border-radius:12px;background:var(--surface-2);padding:6px 0;border:1px solid var(--line)}
+.datebox b{display:block;font-size:20px;font-variant-numeric:tabular-nums;line-height:1.1}
+.datebox{border-color:var(--line-2)!important}
+.datebox b{color:var(--gold-2)}
+.datebox small{font-size:10.5px;text-transform:uppercase;color:var(--gold);letter-spacing:.08em;font-weight:700}
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.03em}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.mute{background:var(--surface-2);color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:28px 12px;display:flex;flex-direction:column;gap:12px;align-items:center}
+
+/* portfolio */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pf{border-radius:14px;overflow:hidden;background:var(--surface);border:1px solid var(--line);text-align:left;display:flex;flex-direction:column}
+.pf img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.pf span{padding:9px 11px 11px;font-size:13px;font-weight:700}
+.pf small{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800;margin-bottom:2px}
+.lb{position:fixed;inset:0;z-index:60;background:rgba(5,5,6,.95);display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.lb-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.lb-x,.lb-n{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;flex:none}
+.lb-x svg,.lb-n svg{width:20px;height:20px}
+.lb-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;margin-block:12px}
+.lb-stage img{max-width:100%;max-height:100%;border-radius:14px;object-fit:contain}
+.lb-n{position:absolute;top:50%;transform:translateY(-50%)}
+.lb-p{left:0}.lb-nx{right:0}
+.lb-foot{max-width:448px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+
+.pixbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center;padding:16px;border-radius:16px;background:var(--surface);border:1px solid var(--line-2)}
+.qr{width:220px;max-width:100%;aspect-ratio:1;background:#fff;border-radius:12px;padding:8px;flex:none}
+.qr svg{width:100%;height:100%;display:block}
+.qr svg rect[fill="white"],.qr svg rect[fill="#ffffff"]{fill:#fff}
+.pixval{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:center}
+.pixval b{font-size:28px;color:var(--gold-2)}
+.pixcode{display:block;margin-top:8px;padding:10px;border-radius:10px;background:var(--surface-2);word-break:break-all;font-size:11.5px;color:var(--ink)}
+details summary{cursor:pointer;color:var(--gold-2);font-weight:700}
+/* barber */
+.barber-pic{display:flex;gap:14px;align-items:center}
+.barber-pic img{width:84px;height:84px;border-radius:50%;object-fit:cover;object-position:50% 30%;border:2px solid var(--gold)}
+.rules li{margin-bottom:6px}
+.rules{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px}
+
+/* admin */
+.modebar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface-2);font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.kpi b{display:block;font-size:20px;font-variant-numeric:tabular-nums;color:var(--gold-2)}
+.kpi span{font-size:11.5px;color:var(--muted)}
+.tl{display:flex;flex-direction:column;gap:8px}
+.ag{display:grid;grid-template-columns:58px 1fr;gap:12px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--gold)}
+.ag.st-concluido{border-left-color:var(--ok)} .ag.st-cancelado,.ag.st-faltou{border-left-color:var(--bad);opacity:.7} .ag.st-pendente{border-left-color:var(--warn)}
+.ag .hr{font-weight:800;font-variant-numeric:tabular-nums;font-size:16px}
+.ag .hr small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+.ag .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.lunch{font-size:12px;color:var(--faint);text-align:center;padding:4px;border:1px dashed var(--line);border-radius:10px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.seg button{min-height:38px;border-radius:9px;font-weight:700;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
+.cl{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px}
+.cl + .cl{border-top:1px solid var(--line)}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--gold-3);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar nav{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;font-size:11px;font-weight:700;color:var(--faint);position:relative}
+.tab .ti{color:var(--gold-3)}
+.tab[aria-current="page"] .ti{color:var(--gold-2)}
+.tab .ti{width:40px;height:30px;border-radius:10px;display:grid;place-items:center}
+.tab .ti svg{width:21px;height:21px}
+.tab[aria-current="page"]{color:var(--gold-2)}
+.tab[aria-current="page"] .ti{background:color-mix(in srgb,var(--gold) 16%,transparent)}
+.tab .bd{position:absolute;top:0;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--gold);color:var(--gold-ink);font-size:10.5px;display:grid;place-items:center;font-weight:800}
+.cartbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(74px + env(safe-area-inset-bottom,0px));width:min(448px,calc(100% - 32px));display:flex;align-items:center;gap:12px;padding:10px 10px 10px 16px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line-2);box-shadow:0 16px 36px -12px #000;z-index:20}
+.cartbar .s{flex:1;min-width:0;font-size:12.5px;color:var(--muted);line-height:1.3}
+.cartbar .s b{color:var(--ink);font-size:15px}
+.cartbar .btn{min-height:42px}
+.toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:13.5px;font-weight:700;z-index:70;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+.sheet{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.sheet .panel{width:100%;max-width:480px;max-height:92%;overflow:auto;background:var(--bg);border:1px solid var(--line-2);border-bottom:0;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<div class="app" id="app"></div>
+<div id="cartbar"></div>
+<div class="tabbar"><nav id="tabs" aria-label="Navegação"></nav></div>
+<div id="overlay"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const IMG = {};
+const APP = "adminweb";
+const URL_CLIENTE = location.origin;
+const API = "/api";            // "/api" no site da Vercel; vazio no Claude
+const VAPID = "BEExW8dt7Nv_hORRQ8zx49DGLWp_ffgHrshrYHxR3Q3n_Qo1XCPCGwAEmW-J6zemnXluVYi3Z_DkPErMWTYkHdc";
+/* ======= CONFIGURAÇÃO (editável) ======= */
+const LOJA = {
+  nome:"Bárbaros Barbershop", wa:"5511944423027", foneTxt:"+55 11 94442-3027",
+  insta:"barbaros_barbersho", pixChave:"+5511944423027", pixNome:"BARBAROS BARBERSHOP", pixCidade:"SAO PAULO", endereco:"",
+  abre:[2,3,4,5,6],            // ter–sáb (0=dom)
+  inicio:9*60, fim:19*60, almoco:[12*60+30, 13*60+30],
+  antecedenciaMin:60, cancelarAteMin:30, cashback:0.05, diasAgenda:21,
+};
+const SERV = [
+  {id:"corte", nome:"Corte", preco:40, min:40, cat:"cabelo"},
+  {id:"barba", nome:"Barba", preco:20, min:30, cat:"barba"},
+  {id:"sob", nome:"Sobrancelha", preco:10, min:10, aPartir:true, cat:"barba"},
+  {id:"cb", nome:"Corte + Barba", preco:60, min:60, combo:["corte","barba"], cat:"combos"},
+  {id:"cbs", nome:"Corte + Barba + Sobrancelha", preco:70, min:70, aPartir:true, combo:["corte","barba","sob"], cat:"combos"},
+  {id:"col", nome:"Coloração · só aplicação", preco:40, min:40, cat:"cor", nota:"Você traz a tinta, a gente aplica.", grupo:"col"},
+  {id:"colp", nome:"Coloração com produto da casa", preco:60, min:40, cat:"cor", nota:"Tinta e produto inclusos.", grupo:"col"},
+  {id:"luzes", nome:"Luzes", preco:90, min:60, aPartir:true, cat:"cor", nota:"Tempo varia com o cabelo: há cabelo que abre mais rápido e outro que demora mais. Reservamos 1h e ajustamos no WhatsApp."},
+];
+const CATS=[{id:"todos",nome:"Todos"},{id:"cabelo",nome:"Cabelo"},{id:"barba",nome:"Barba"},{id:"combos",nome:"Combos"},{id:"cor",nome:"Coloração"}];
+const PF = [
+  {img:"p1",cat:"cortes",t:"Degradê com risco na navalha"},
+  {img:"p2",cat:"cortes",t:"Mid fade no crespo"},
+  {img:"p7",cat:"barba",t:"Skin fade + barba desenhada"},
+  {img:"p6",cat:"barba",t:"Antes e depois: corte + barba"},
+  {img:"p3",cat:"cor",t:"Platinado"},
+  {img:"p5",cat:"cortes",t:"High fade"},
+  {img:"p8",cat:"cortes",t:"Risco e acabamento"},
+  {img:"p4",cat:"cadeira",t:"Na cadeira: low fade"},
+  {img:"p9",cat:"cadeira",t:"Acabamento na tesoura"},
+];
+const PF_CATS=[{id:"todos",nome:"Todos"},{id:"cortes",nome:"Cortes"},{id:"barba",nome:"Barba"},{id:"cor",nome:"Coloração"},{id:"cadeira",nome:"Na cadeira"}];
+const BARB_PADRAO=[{id:"b1",nome:"Barbeiro titular"}];
+
+/* ======= utilidades ======= */
+const ICON={
+  home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  scis:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+  gal:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+  check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>', plus:'<path d="M12 5v14M5 12h14"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  l:'<path d="m15 5-7 7 7 7"/>', r:'<path d="m9 5 7 7-7 7"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  wa:'<path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.3z"/><path d="M9 9.2c.2 2.6 2.9 5.4 5.8 5.8l1.2-1.4-1.9-1-1 .8c-1-.4-2-1.4-2.4-2.4l.8-1-1-1.9z"/>',
+  ig:'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".8" fill="currentColor"/>',
+  crown:'<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/>', coin:'<circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.5-.8-1.5-1.2-2.8-1.2-1.7 0-2.8.8-2.8 2s1.1 1.7 2.8 2 2.8.8 2.8 2-1.1 2-2.8 2c-1.3 0-2.3-.4-2.8-1.2M12 6v2M12 16v2"/>',
+  pin:'<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  copy:'<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>', gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  back:'<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+};
+const ic=(n,s="")=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${s}>${ICON[n]}</svg>`;
+const brl=v=>"R$ "+(Math.round(v*100)/100).toFixed(2).replace(".",",");
+const dur=m=>{const h=Math.floor(m/60),r=m%60;return h?(h+"h"+(r?String(r).padStart(2,"0"):"")):r+"min"};
+const hm=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const toMin=s=>{const[a,b]=s.split(":").map(Number);return a*60+b};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const fromIso=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const br=s=>{const d=fromIso(s);return d.toLocaleDateString("pt-BR")};
+const DOW=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+const DOWS=["dom","seg","ter","qua","qui","sex","sáb"];
+const MES=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const digits=s=>String(s||"").replace(/\D/g,"");
+const nowMin=()=>{const n=new Date();return n.getHours()*60+n.getMinutes()};
+const uid=()=>Date.now().toString(36).slice(-5).toUpperCase()+Math.random().toString(36).slice(2,4).toUpperCase();
+const store={get(k,d){try{const v=localStorage.getItem("barbaros:"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("barbaros:"+k,JSON.stringify(v))}catch(e){}}};
+let toastT;function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2400)}
+async function copy(txt,msg){try{await navigator.clipboard.writeText(txt);toast(msg)}catch(e){toast("Não deu para copiar. Selecione e copie o texto.")}}
+function openLink(url){const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove()}
+const waTo=(num,txt)=>`https://wa.me/${num}?text=${encodeURIComponent(txt)}`;
+
+/* ======= servidor ======= */
+const DEV=(()=>{let d=store.get("dev","");if(!/^[a-z0-9]{8,40}$/.test(d)){d=(Math.random().toString(36).slice(2)+Date.now().toString(36)).slice(0,24);store.set("dev",d)}return d})();
+async function api(path,opt={}){
+  const r=await fetch(API+path,{...opt,headers:{"content-type":"application/json",...(opt.headers||{})},cache:"no-store"});
+  let j={};try{j=await r.json()}catch(e){}
+  if(!r.ok){const er=new Error(j.erro||("Erro "+r.status));er.status=r.status;throw er}
+  return j;
+}
+function b64u(t){const p="=".repeat((4-t.length%4)%4);const b=atob((t+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from([...b].map(c=>c.charCodeAt(0)))}
+const PUSH_OK=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+async function inscreverPush(){
+  if(!PUSH_OK()){toast(/iPhone|iPad/i.test(navigator.userAgent)?"No iPhone, instale o app na tela inicial para receber avisos.":"Este navegador não recebe avisos.");return null}
+  const perm=await Notification.requestPermission();
+  if(perm!=="granted"){toast("Avisos não autorizados. Libere nas configurações do navegador.");return null}
+  const reg=await navigator.serviceWorker.ready;
+  return (await reg.pushManager.getSubscription())||(await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID)}));
+}
+async function ativarAvisosCliente(){
+  const fone=S.fone||(S.meus[S.meus.length-1]||{}).fone;if(digits(fone).length<10){toast("Preencha seu WhatsApp primeiro.");return}
+  try{const sub=await inscreverPush();if(!sub)return;await api("/sub",{method:"POST",body:JSON.stringify({fone,sub})});store.set("push",true);toast("Avisos ativados neste celular");render()}catch(e){toast("Não deu para ativar os avisos agora.")}
+}
+async function carregaOcupados(){if(!API)return;try{const j=await api("/ocupados");OCUP=j.dias||{};if(S.tab==="agendar")render()}catch(e){}}
+async function syncMeus(){
+  if(!API||!S.meus.length)return;const fone=S.fone||S.meus[S.meus.length-1].fone;
+  try{const j=await api("/meus?fone="+encodeURIComponent(digits(fone))+"&ids="+S.meus.slice(-40).map(b=>b.id).join(","));
+    let mud=false;for(const b of S.meus){const x=j.status&&j.status[b.id];if(x&&(x.status!==b.status||x.pago!==b.pago)){b.status=x.status;b.pago=x.pago;mud=true}}
+    if(typeof j.saldo==="number"&&j.saldo!==S.cbServer){S.cbServer=j.saldo;mud=true}
+    if(mud){store.set("meus",S.meus);render()}}catch(e){}
+}
+function registraAparelho(modo){if(!API)return;const app=APP==="adminweb"?"painel":"cliente",k="inst:"+app+":"+modo;if(store.get(k,false))return;
+  api("/install",{method:"POST",body:JSON.stringify({device:DEV,modo,app})}).then(()=>store.set(k,true)).catch(()=>{})}
+
+/* ======= Pix (BR Code estático, padrão Banco Central) ======= */
+function crc16(t){let c=0xFFFF;for(let i=0;i<t.length;i++){c^=t.charCodeAt(i)<<8;for(let j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
+const emv=(id,v)=>id+String(v.length).padStart(2,"0")+v;
+const ascii=(t,n)=>String(t).normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9 ]/g,"").toUpperCase().slice(0,n);
+function pixChave(){return (S.cfg.pixChave||LOJA.pixChave||"").trim()}
+function pixPayload(valor,txid){
+  const p=emv("00","01")+emv("26",emv("00","br.gov.bcb.pix")+emv("01",pixChave()))+emv("52","0000")+emv("53","986")+(valor>0?emv("54",valor.toFixed(2)):"")+
+    emv("58","BR")+emv("59",ascii(LOJA.pixNome,25))+emv("60",ascii(LOJA.pixCidade,15))+emv("62",emv("05",(String(txid||"").replace(/[^A-Za-z0-9]/g,"").slice(0,25))||"***"))+"6304";
+  return p+crc16(p);
+}
+function qrSvg(t){try{if(!window.qrcode)return "";const q=qrcode(0,"M");q.addData(t);q.make();return q.createSvgTag({cellSize:4,margin:2,scalable:true})}catch(e){return ""}}
+function valorPix(b){return Math.max(0,Math.round((b.preco-(b.cbUsado||0))*100)/100)}
+function PixSheet(b){
+  const v=valorPix(b),code=pixPayload(v,b.id),svg=qrSvg(code);
+  return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Pagar com Pix">
+    <div class="between"><div><span class="eyebrow">Pagamento pelo app</span><h2 style="margin-top:4px">Pagar com Pix</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <div class="pixbox">${svg?`<div class="qr">${svg}</div>`:`<p class="small" style="margin:0">Não foi possível desenhar o QR Code aqui. Use o Pix Copia e Cola abaixo.</p>`}
+      <div class="pixval"><span class="tiny">Valor</span><b class="num">${brl(v)}</b><span class="tiny">${esc(b.servicos.join(" + "))} · ${br(b.data)} ${b.hora}</span></div></div>
+    <button class="btn btn-gold" data-copy="${esc(code)}" data-msg="Código Pix copiado. Cole no app do seu banco.">${ic("copy")} Pix Copia e Cola</button>
+    <details class="tiny"><summary>Ver código</summary><code class="pixcode">${esc(code)}</code></details>
+    <ol class="rules"><li>Abra o app do seu banco e escolha <b>Pix → Ler QR Code</b> ou <b>Pix Copia e Cola</b>.</li><li>Confira o valor de ${brl(v)} e o recebedor <b>${esc(ascii(LOJA.pixNome,25))}</b>, chave ${esc(pixChave())}.</li><li>Depois de pagar, mande o comprovante no WhatsApp.</li></ol>
+    ${b.aPartir?`<div class="note">Este serviço tem preço "a partir de". Se o valor final for maior, a diferença é paga na barbearia.</div>`:""}
+    <a class="btn btn-wa" href="${waTo(LOJA.wa,`*Comprovante Pix — ${LOJA.nome}*\n\n*Código:* ${b.id}\n*Valor:* ${brl(v)}\n*Cliente:* ${b.nome}\n\nSegue o comprovante:`)}" target="_blank" rel="noopener">${ic("wa")} Já paguei: enviar comprovante</a>
+    <p class="tiny" style="margin:0">O cashback de 5% (${brl(Math.round(v*LOJA.cashback*100)/100)}) libera depois do atendimento.</p></div></div>`;
+}
+/* ======= estado ======= */
+const S={
+  tab:"inicio", mode:"cliente", cat:"todos", pfCat:"todos",
+  sel:new Set(), step:1, barb:"qualquer", date:null, time:null, pay:"loja", useCb:false,
+  nome:store.get("nome",""), fone:store.get("fone",""), err:{}, done:null,
+  meus:store.get("meus",[]),
+  // admin / nuvem
+  db:null, user:null, isAdmin:false, cfg:{barbeiros:BARB_PADRAO,pixChave:LOJA.pixChave,endereco:LOJA.endereco}, busy:{},
+  agenda:[], clientes:{}, aTab:"agenda", aDay:iso(new Date()), aView:"dia", cloud:"off",
+  pin:store.get("pin",""), auth:"nao", inst:null, qcli:"", cbServer:null, enviando:false,
+};
+const barbs=()=>S.cfg.barbeiros&&S.cfg.barbeiros.length?S.cfg.barbeiros:BARB_PADRAO;
+const svc=id=>SERV.find(s=>s.id===id);
+
+/* combos inteligentes: corte+barba vira combo (10 min a menos) */
+function normalize(set){
+  const s=new Set(set);
+  const has=x=>s.has(x);
+  if(has("cb")&&has("sob")){s.delete("cb");s.delete("sob");s.add("cbs")}
+  if(has("corte")&&has("barba")){s.delete("corte");s.delete("barba");s.add(has("sob")?"cbs":"cb");if(has("sob"))s.delete("sob")}
+  if(has("cbs")){["corte","barba","sob","cb"].forEach(x=>s.delete(x))}
+  return s;
+}
+function totals(){const list=[...S.sel].map(svc);const preco=list.reduce((a,s)=>a+s.preco,0),min=list.reduce((a,s)=>a+s.min,0)-(S.sel.has("corte")&&S.sel.has("barba")?10:0);return{list,preco,min,aPartir:list.some(s=>s.aPartir)}}
+
+/* cashback local (do aparelho do cliente) */
+function cbSaldo(){if(S.cbServer!=null)return S.cbServer;const t=new Date();return S.meus.filter(b=>b.status!=="cancelado"&&b.cbGanho&&!b.cbUsadoEm&&new Date(b.data+"T"+b.hora)<t).reduce((a,b)=>a+b.cbGanho,0)}
+function cbPendente(){const t=new Date();return S.meus.filter(b=>b.status!=="cancelado"&&b.cbGanho&&new Date(b.data+"T"+b.hora)>=t).reduce((a,b)=>a+b.cbGanho,0)}
+
+/* ======= disponibilidade ======= */
+let OCUP={}; // { "2026-10-14": [{i:540,f:580,b:"b1"}] } — publicado pelo barbeiro
+function dias(){const out=[];const d=new Date();d.setHours(0,0,0,0);for(let k=0;out.length<LOJA.diasAgenda&&k<60;k++){const x=new Date(d);x.setDate(d.getDate()+k);out.push(x)}return out}
+function lojaAberta(d){return LOJA.abre.includes(d.getDay())}
+function livre(dateIso,ini,fim,barbId){
+  const occ=(OCUP[dateIso]||[]).concat(S.isAdmin?[]:[]);
+  const ids=barbId==="qualquer"?barbs().map(b=>b.id):[barbId];
+  return ids.find(id=>!occ.some(o=>(o.b===id||!o.b)&&ini<o.f&&fim>o.i))||null;
+}
+function slotsDo(dateIso,min,barbId){
+  const d=fromIso(dateIso);if(!lojaAberta(d))return[];
+  const hoje=iso(new Date())===dateIso, lim=nowMin()+LOJA.antecedenciaMin, out=[];
+  for(let t=LOJA.inicio;t+Math.max(min,10)<=LOJA.fim;t+=30){
+    const f=t+Math.max(min,10);
+    let ok=true,why="";
+    if(t<LOJA.almoco[1]&&f>LOJA.almoco[0]){ok=false;why="almoço"}
+    if(ok&&hoje&&t<lim){ok=false;why="antecedência"}
+    if(ok&&!livre(dateIso,t,f,barbId)){ok=false;why="ocupado"}
+    out.push({t,ok,why});
+  }
+  return out;
+}
+function diaTemVaga(d,min){return slotsDo(iso(d),min,S.barb).some(s=>s.ok)}
+
+/* ======= telas: cliente ======= */
+function Inicio(){
+  const saldo=cbSaldo();
+  return `<section class="screen">
+  <div class="hero"><div class="hero-img" data-olhos><span class="eye" style="left:44.7%;top:39.8%"></span><span class="eye" style="left:55.2%;top:39.8%"></span><span class="eye bg" style="left:54.2%;top:11.7%"></span><span class="eye bg" style="left:84.6%;top:11.6%"></span><img src="${IMG.logo}" alt="Bárbaros Barbershop: gorila com coroa de ouro, navalhas cruzadas e monograma BB dourado"></div>
+    <span class="eyebrow">Barbearia · agendamento online</span>
+    <p class="tag" style="margin:8px 0 0">Corte, barba, sobrancelha e coloração com hora marcada. Escolha o serviço, o horário e confirme pelo WhatsApp.</p>
+    <div class="hero-cta">
+      <button class="btn btn-gold" data-go="agendar">${ic("cal")} Agendar horário</button>
+      <a class="btn btn-wa" href="${waTo(LOJA.wa,"Olá! Vim pelo app da Bárbaros e queria tirar uma dúvida.")}" target="_blank" rel="noopener">${ic("wa")} WhatsApp</a>
+      <a class="btn btn-ig" href="https://www.instagram.com/${LOJA.insta}" target="_blank" rel="noopener">${ic("ig")} Instagram</a>
+    </div>
+  </div>
+  <div class="facts">
+    <div class="fact"><b>Ter–Sáb</b><span>dias de atendimento</span></div>
+    <div class="fact"><b class="num">9h–19h</b><span>almoço 12h30–13h30</span></div>
+    <div class="fact"><b class="num">5%</b><span>de cashback pagando pelo app</span></div>
+  </div>
+  ${INSTALADO?"":`<button class="btn btn-line" data-instalar>${ic("plus")} Instalar no celular</button>`}
+  <div class="club">
+    <div class="between"><span class="eyebrow">${ic("crown",'style="width:14px;height:14px;vertical-align:-2px"')} Clube Bárbaros</span>${saldo?`<span class="pill ok">${brl(saldo)} disponível</span>`:""}</div>
+    <div class="row" style="margin-top:10px;align-items:flex-end"><span class="big">5%</span><span class="small" style="padding-bottom:3px">de volta em todo serviço pago pelo app, para usar no próximo agendamento.</span></div>
+  </div>
+  <div class="between"><h2>Serviços</h2><button class="link" data-go="servicos">Ver tabela ${ic("r",'style="width:14px;height:14px"')}</button></div>
+  <div class="stack">${["corte","cb","cbs"].map(id=>SvcRow(svc(id))).join("")}</div>
+  <div class="between"><h2>Trabalhos</h2><button class="link" data-go="portfolio">Portfólio ${ic("r",'style="width:14px;height:14px"')}</button></div>
+  <div class="strip">${PF.map((p,i)=>`<button data-lb="${i}" aria-label="${esc(p.t)}"><img src="${IMG[p.img]}" alt="${esc(p.t)}" loading="lazy"></button>`).join("")}</div>
+  ${Barbeiro()}
+  </section>`;
+}
+function SvcRow(s,mode){
+  const on=S.sel.has(s.id);
+  return `<button class="svc ${on?"on":""}" data-tog="${s.id}" aria-pressed="${on}">
+    <span class="tick">${ic("check")}</span>
+    <span class="t"><b>${esc(s.nome)}${s.combo?`<span class="combo">combo</span>`:""}</b><span class="meta num">${s.aPartir&&s.id==="luzes"?"a partir de ":""}${dur(s.min)}</span>${s.nota&&mode!=="compact"?`<span class="note">${esc(s.nota)}</span>`:""}</span>
+    <span class="r">${s.aPartir?`<span class="from">a partir de</span>`:""}<span class="price">${brl(s.preco)}</span></span></button>`;
+}
+function Servicos(){
+  const list=SERV.filter(s=>S.cat==="todos"||s.cat===S.cat);
+  return `<section class="screen">
+  <div class="head"><span class="eyebrow">Tabela</span><h1>Serviços e valores</h1><p class="small" style="margin:0">Toque para marcar e toque de novo para desmarcar. Escolher um combo troca os serviços avulsos que ele já inclui.</p></div>
+  <div class="chips">${CATS.map(c=>`<button class="chip" data-cat="${c.id}" aria-pressed="${S.cat===c.id}">${c.nome}</button>`).join("")}</div>
+  <div class="stack">${list.map(s=>SvcRow(s)).join("")}</div>
+  <div class="note info">Sobrancelha, combo com sobrancelha e luzes têm preço "a partir de": o valor final depende do volume e do resultado desejado, e é combinado antes de começar.</div>
+  </section>`;
+}
+function Steps(){const L=["Serviço","Profissional","Horário","Confirmar"];return `<div class="stack" style="gap:8px"><div class="steps">${L.map((_,i)=>`<span class="${i<S.step?"on":""}"></span>`).join("")}</div><div class="steplbl"><span>Etapa ${S.step} de 4</span><b>${L[S.step-1]}</b></div></div>`}
+function Agendar(){
+  if(S.done) return Feito();
+  const {list,preco,min,aPartir}=totals();
+  const multi=barbs().length>1;
+  const sum=`<div class="sum"><span class="l">${list.length?esc(list.map(s=>s.nome).join(" · ")):"Nenhum serviço"}</span><span class="tiny num">${dur(min)}</span><span class="price">${aPartir?"a partir de ":""}${brl(preco)}</span></div>`;
+  let body="";
+  if(S.step===1){
+    body=`<div class="stack">${SERV.map(s=>SvcRow(s,"compact")).join("")}</div>
+    <div class="nav"><button class="btn btn-gold" data-next ${list.length?"":"disabled"}>Continuar ${ic("r")}</button></div>`;
+  }else if(S.step===2){
+    body=`<div class="lbl">${ic("user")} Com quem?</div>
+    <div class="pros"><button class="pro" data-barb="qualquer" aria-pressed="${S.barb==="qualquer"}"><b>Quem estiver disponível</b><span>Mais horários livres</span></button>
+    ${barbs().map(b=>`<button class="pro" data-barb="${b.id}" aria-pressed="${S.barb===b.id}"><b>${esc(b.nome)}</b><span>Barbeiro</span></button>`).join("")}</div>
+    ${multi?"":`<p class="small" style="margin:0">Hoje a casa atende com um barbeiro. Quando entrar mais alguém na equipe, ele aparece aqui.</p>`}
+    <div class="nav"><button class="btn btn-line" data-prev>${ic("l")} Voltar</button><button class="btn btn-gold" data-next>Continuar ${ic("r")}</button></div>`;
+  }else if(S.step===3){
+    const ds=dias();
+    const sl=S.date?slotsDo(S.date,min,S.barb):[];
+    const per=(a,b,n)=>{const x=sl.filter(s=>s.t>=a&&s.t<b);return x.length?`<span class="period">${n}</span><div class="slots">${x.map(s=>`<button class="slot ${S.time===s.t?"sel":""}" data-time="${s.t}" ${s.ok?"":"disabled"} title="${s.ok?"":s.why}">${hm(s.t)}</button>`).join("")}</div>`:""};
+    body=`<div class="lbl">${ic("cal")} Dia</div>
+    <div class="days">${ds.map(d=>{const open=lojaAberta(d),has=open&&diaTemVaga(d,min);return `<button class="day ${S.date===iso(d)?"sel":""}" data-date="${iso(d)}" ${has?"":"disabled"}><small>${DOWS[d.getDay()]}</small><b>${d.getDate()}</b><i>${open?(has?MES[d.getMonth()]:"lotado"):"fechado"}</i></button>`}).join("")}</div>
+    <div class="lbl">${ic("clock")} Horário ${S.date?`<span class="tiny" style="font-weight:500">· ${DOW[fromIso(S.date).getDay()]}, ${br(S.date)}</span>`:""}</div>
+    ${S.date?per(0,12*60,"Manhã")+per(12*60,24*60,"Tarde"):`<p class="small" style="margin:0">Escolha um dia acima.</p>`}
+    ${S.time!=null?`<p class="small" style="margin:0">Atendimento das <b class="num">${hm(S.time)}</b> às <b class="num">${hm(S.time+min)}</b>${S.sel.has("luzes")?" (luzes pode passar disso)":""}.</p>`:""}
+    <p class="tiny" style="margin:0">Agendamentos com até ${LOJA.antecedenciaMin/60}h de antecedência. Horários riscados já estão ocupados, caem no almoço ou estão em cima da hora.</p>
+    <div class="nav"><button class="btn btn-line" data-prev>${ic("l")} Voltar</button><button class="btn btn-gold" data-next ${S.date&&S.time!=null?"":"disabled"}>Continuar ${ic("r")}</button></div>`;
+  }else{
+    const saldo=cbSaldo(), usa=S.useCb&&saldo>0?Math.min(saldo,preco):0, total=preco-usa;
+    const ganho=S.pay==="app"?total*LOJA.cashback:0;
+    const bName=S.barb==="qualquer"?"Quem estiver disponível":barbs().find(b=>b.id===S.barb)?.nome;
+    body=`<div class="card receipt"><dl>
+      <dt>Serviço</dt><dd>${esc(list.map(s=>s.nome).join(" + "))}</dd>
+      <dt>Profissional</dt><dd>${esc(bName)}</dd>
+      <dt>Dia</dt><dd>${DOW[fromIso(S.date).getDay()]}, ${br(S.date)}</dd>
+      <dt>Horário</dt><dd class="num">${hm(S.time)} – ${hm(S.time+min)}</dd></dl><hr>
+      <dl><dt>Valor</dt><dd class="num">${aPartir?"a partir de ":""}${brl(preco)}</dd>${usa?`<dt>Cashback usado</dt><dd class="num" style="color:var(--ok)">− ${brl(usa)}</dd>`:""}</dl><hr>
+      <div class="total"><span>Total</span><b>${aPartir?'<small class="tiny" style="font-weight:500">a partir de </small>':""}${brl(total)}</b></div></div>
+    <div class="lbl">${ic("coin")} Como prefere pagar?</div>
+    <div class="pay">
+      <button class="payopt" data-pay="app" aria-pressed="${S.pay==="app"}"><span class="rd"></span><span><b>Pagar pelo app (Pix) <span class="badge">+5% cashback</span></b><span class="small">Você paga antecipado via Pix e ganha ${brl(total*LOJA.cashback)} de volta para o próximo agendamento.</span></span></button>
+      <button class="payopt" data-pay="loja" aria-pressed="${S.pay==="loja"}"><span class="rd"></span><span><b>Pagar na barbearia</b><span class="small">Pix, cartão ou dinheiro no dia do atendimento.</span></span></button>
+    </div>
+    ${S.pay==="app"?`<div class="card pad stack" style="gap:10px"><div class="between"><span class="small">Valor no Pix</span><b class="price num">${brl(total)}</b></div><button class="btn btn-gold" data-pixnow>${ic("coin")} Pagar Pix</button><p class="tiny" style="margin:0">Abre o QR Code e o Pix Copia e Cola. Se preferir, pague depois em Minha conta.</p></div>`:""}
+    ${saldo>0?`<div class="toggle"><button class="sw" role="switch" aria-checked="${S.useCb}" data-usecb aria-label="Usar cashback"></button><div><b>Usar meu cashback</b><div class="small">Você tem ${brl(saldo)} no Clube Bárbaros.</div></div></div>`:""}
+    <div class="field"><label class="lbl" for="nome">${ic("user")} Seu nome</label><input id="nome" autocomplete="name" placeholder="Como te chamamos?" value="${esc(S.nome)}">${S.err.nome?`<span class="err">Digite seu nome.</span>`:""}</div>
+    <div class="field"><label class="lbl" for="fone">${ic("wa")} WhatsApp</label><input id="fone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 9 0000-0000" value="${esc(S.fone)}">${S.err.fone?`<span class="err">Digite um WhatsApp com DDD para receber a confirmação e o lembrete.</span>`:""}</div>
+    <div class="note info">Cancelamento ou troca de horário: avise com pelo menos ${LOJA.cancelarAteMin} min de antecedência, pelo app ou WhatsApp.</div>
+    <div class="nav"><button class="btn btn-line" data-prev>${ic("l")} Voltar</button><button class="btn btn-gold" data-confirm ${S.enviando?"disabled":""}>${ic("check")} ${S.enviando?"Enviando…":"Confirmar agendamento"}</button></div>`;
+  }
+  return `<section class="screen"><div class="head"><span class="eyebrow">Agendamento</span><h1>Reserve seu horário</h1></div>${Steps()}${sum}${body}</section>`;
+}
+function msgAgendamento(b){
+  return [`*Novo agendamento — ${LOJA.nome}*`,"",`*Código:* ${b.id}`,`*Serviço:* ${b.servicos.join(" + ")}`,`*Profissional:* ${b.barbNome}`,
+   `*Data:* ${br(b.data)} (${DOW[fromIso(b.data).getDay()]})`,`*Horário:* ${b.hora} às ${hm(toMin(b.hora)+b.min)}`,
+   `*Valor:* ${b.aPartir?"a partir de ":""}${brl(b.preco)}`,...(b.cbUsado?[`*Cashback usado:* ${brl(b.cbUsado)}`,`*Total:* ${brl(b.preco-b.cbUsado)}`]:[]),
+   `*Pagamento:* ${b.pay==="app"?"Pix pelo app (QR Code gerado no app)":"Na barbearia"}`,
+   `*Cliente:* ${b.nome}`,`*WhatsApp:* ${b.fone}`].join("\n");
+}
+function gcal(b){
+  const d=b.data.replace(/-/g,""),s=b.hora.replace(":","")+"00",e=hm(toMin(b.hora)+b.min).replace(":","")+"00";
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("Bárbaros Barbershop · "+b.servicos.join(" + "))+
+   "&dates="+d+"T"+s+"/"+d+"T"+e+"&ctz=America/Sao_Paulo&details="+encodeURIComponent("Código "+b.id+". Para cancelar, avise até 30 min antes: wa.me/"+LOJA.wa)+(LOJA.endereco||S.cfg.endereco?"&location="+encodeURIComponent(S.cfg.endereco||LOJA.endereco):"");
+}
+function Feito(){
+  const b=S.done;
+  const avisosOn=store.get("push",false)&&typeof Notification!=="undefined"&&Notification.permission==="granted";
+  return `<section class="screen"><div class="card okc"><span class="ic">${ic("check")}</span><h1>${b.registrado?"Horário reservado":"Pedido enviado"}</h1>
+    <p class="muted" style="margin:0">${b.registrado?"A barbearia já recebeu seu pedido no painel e vai confirmar. Você acompanha a confirmação em Conta.":"Não conseguimos falar com o servidor agora. Envie o pedido pelo WhatsApp para garantir o horário."}</p>
+    ${b.registrado&&API&&!avisosOn?`<div class="notif w100" style="text-align:left">${ic("bell",'style="width:22px;height:22px;color:var(--gold-2);flex:none"')}<div style="flex:1"><b>Receber avisos no celular</b><div class="tiny">Confirmação do horário e lembrete na véspera.</div></div><button class="btn btn-gold btn-sm" data-avisos>Ativar</button></div>`:""}
+    <div class="card receipt w100" style="text-align:left"><dl><dt>Código</dt><dd class="num">${b.id}</dd><dt>Quando</dt><dd>${br(b.data)} · ${b.hora}</dd><dt>Serviço</dt><dd>${esc(b.servicos.join(" + "))}</dd><dt>Pagamento</dt><dd>${b.pay==="app"?"Pix pelo app":"Na barbearia"}</dd></dl></div>
+    ${b.pay==="app"?`<div class="card pad w100 stack" style="text-align:left"><div class="lbl">${ic("coin")} Pague agora com Pix</div>${qrSvg(pixPayload(valorPix(b),b.id))?`<div class="qr" style="margin:0 auto">${qrSvg(pixPayload(valorPix(b),b.id))}</div>`:""}<div class="between"><span class="small">Valor</span><b class="price num">${brl(valorPix(b))}</b></div><button class="btn btn-gold" data-pix="${b.id}">${ic("coin")} Abrir Pix (QR e Copia e Cola)</button><p class="tiny" style="margin:0">Cashback de ${brl(b.cbGanho)} liberado depois do atendimento.</p></div>`:""}
+    <div class="stack w100"><a class="btn btn-wa" href="${waTo(LOJA.wa,msgAgendamento(b))}" target="_blank" rel="noopener">${ic("wa")} ${b.registrado?"Avisar também no WhatsApp (opcional)":"Enviar pelo WhatsApp"}</a>
+    <a class="btn btn-line" href="${gcal(b)}" target="_blank" rel="noopener">${ic("bell")} Lembrete no Google Agenda</a>
+    <button class="btn btn-ghost" data-copy="${esc(msgAgendamento(b))}" data-msg="Mensagem copiada">${ic("copy")} Copiar mensagem</button></div>
+    <button class="link" data-novo>Fazer outro agendamento</button></div></section>`;
+}
+function bkStatus(b){const t=new Date(b.data+"T"+b.hora),now=new Date();if(b.status==="cancelado")return["Cancelado","bad"];if(b.status==="faltou")return["Não compareceu","bad"];if(b.status==="concluido")return["Realizado","mute"];if(b.status==="confirmado")return t<now?["Realizado","mute"]:["Confirmado","ok"];if(t<now)return["Realizado","mute"];return["Aguardando confirmação","warn"]}
+function Conta(){
+  const now=new Date();
+  const prox=S.meus.filter(b=>b.status!=="cancelado"&&new Date(b.data+"T"+b.hora)>=now).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora));
+  const hist=S.meus.filter(b=>!prox.includes(b)).sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));
+  const card=b=>{const d=fromIso(b.data),[lbl,cls]=bkStatus(b),mins=(new Date(b.data+"T"+b.hora)-now)/60000,podeCancel=b.status!=="cancelado"&&mins>LOJA.cancelarAteMin;
+    return `<div class="card bk"><div class="when"><div class="datebox"><small>${MES[d.getMonth()]}</small><b>${d.getDate()}</b></div><div style="flex:1;min-width:0"><b>${esc(b.servicos.join(" + "))}</b><div class="small num">${DOW[d.getDay()]} · ${b.hora}–${hm(toMin(b.hora)+b.min)} · ${b.pay==="app"?"Pix pelo app":"na barbearia"}</div></div></div>
+    <div class="between"><span class="pill ${cls}">${lbl}</span><span class="price">${brl(b.preco-(b.cbUsado||0))}</span></div>
+    ${prox.includes(b)?`<div class="row" style="flex-wrap:wrap">${b.pay==="app"?`<button class="btn btn-gold btn-sm" data-pix="${b.id}">${ic("coin")} Pagar Pix</button>`:""}<a class="btn btn-line btn-sm" href="${gcal(b)}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>${podeCancel?`<button class="btn btn-danger btn-sm" data-cancel="${b.id}">Cancelar</button>`:`<span class="tiny">Cancelamento só até ${LOJA.cancelarAteMin} min antes. Fale no WhatsApp.</span>`}</div>`:""}</div>`};
+  return `<section class="screen"><div class="head"><span class="eyebrow">Minha conta</span><h1>${S.nome?esc(S.nome.split(" ")[0]):"Seus horários"}</h1></div>
+  <div class="club"><span class="eyebrow">${ic("crown",'style="width:14px;height:14px;vertical-align:-2px"')} Clube Bárbaros</span>
+    <div class="between" style="margin-top:10px;align-items:flex-end"><div><div class="big num">${brl(cbSaldo())}</div><span class="small">disponível para o próximo corte</span></div>${cbPendente()?`<span class="pill warn">+${brl(cbPendente())} a liberar</span>`:""}</div>
+    <p class="tiny" style="margin:10px 0 0">Ganhe 5% de volta em todo serviço pago pelo app. O valor libera depois do atendimento e a barbearia confere no sistema dela.</p></div>
+  ${API&&S.meus.length&&!(store.get("push",false)&&typeof Notification!=="undefined"&&Notification.permission==="granted")?`<div class="notif">${ic("bell",'style="width:22px;height:22px;color:var(--gold-2);flex:none"')}<div style="flex:1"><b>Avisos no celular</b><div class="tiny">Saiba na hora quando a barbearia confirmar e receba lembrete na véspera.</div></div><button class="btn btn-gold btn-sm" data-avisos>Ativar</button></div>`:""}
+  <h2>Próximos</h2>
+  ${prox.length?prox.map(card).join(""):`<div class="card empty"><span>Nenhum horário marcado.</span><button class="btn btn-gold" data-go="agendar">${ic("cal")} Agendar agora</button></div>`}
+  ${hist.length?`<h2>Histórico</h2>${hist.map(card).join("")}`:""}
+  <div class="card pad stack"><h3>Seus dados</h3>
+    <div class="field"><label class="small" for="cnome">Nome</label><input id="cnome" value="${esc(S.nome)}" placeholder="Seu nome" autocomplete="name"></div>
+    <div class="field"><label class="small" for="cfone">WhatsApp</label><input id="cfone" type="tel" inputmode="tel" value="${esc(S.fone)}" placeholder="(11) 9 0000-0000" autocomplete="tel"></div>
+    <p class="tiny" style="margin:0">Ficam salvos só neste aparelho para preencher o próximo agendamento.</p></div>
+  </section>`;
+}
+function Portfolio(){
+  const list=PF.map((p,i)=>({...p,i})).filter(p=>S.pfCat==="todos"||p.cat===S.pfCat);
+  return `<section class="screen"><div class="head"><span class="eyebrow">Portfólio</span><h1>Feito na cadeira</h1><p class="small" style="margin:0">Mais trabalhos no Instagram <a class="link" href="https://www.instagram.com/${LOJA.insta}" target="_blank" rel="noopener">@${LOJA.insta}</a></p></div>
+  <div class="chips">${PF_CATS.map(c=>`<button class="chip" data-pfc="${c.id}" aria-pressed="${S.pfCat===c.id}">${c.nome}</button>`).join("")}</div>
+  <div class="grid">${list.map(p=>`<button class="pf" data-lb="${p.i}"><img src="${IMG[p.img]}" alt="${esc(p.t)}" loading="lazy"><span><small>${esc(PF_CATS.find(c=>c.id===p.cat).nome)}</small>${esc(p.t)}</span></button>`).join("")}</div>
+  <button class="btn btn-gold" data-go="agendar">${ic("cal")} Quero esse estilo</button></section>`;
+}
+function Barbeiro(){
+  return `<div class="card pad stack"><div class="barber-pic"><img src="${IMG.barbeiro}" alt="Barbeiro da Bárbaros com a máquina na mão"><div><span class="eyebrow">A casa</span><h2 style="margin-top:4px">${LOJA.nome}</h2><p class="small" style="margin:2px 0 0">Atendimento com hora marcada, de terça a sábado.</p></div></div>
+  <ul class="rules"><li>Ter a sáb, 9h às 19h · almoço 12h30–13h30</li><li>Agende com pelo menos 1h de antecedência</li><li>Cancelamento até 30 min antes do horário</li>${S.cfg.endereco?`<li>${esc(S.cfg.endereco)}</li>`:""}</ul>
+  <div class="row"><a class="btn btn-wa btn-sm" style="flex:1" href="https://wa.me/${LOJA.wa}" target="_blank" rel="noopener">${ic("wa")} WhatsApp</a><a class="btn btn-ig btn-sm" href="https://www.instagram.com/${LOJA.insta}" target="_blank" rel="noopener">${ic("ig")} Instagram</a></div></div>`;
+}
+
+/* ======= painel do barbeiro ======= */
+const ST={pendente:["A confirmar","warn"],confirmado:["Confirmado","ok"],concluido:["Concluído","ok"],cancelado:["Cancelado","bad"],faltou:["Faltou","bad"]};
+function PainelAgenda(){
+  const day=S.aDay, d=fromIso(day);
+  const items=S.agenda.filter(a=>a.data===day).sort((a,b)=>a.hora.localeCompare(b.hora));
+  const ativos=items.filter(a=>!["cancelado","faltou"].includes(a.status));
+  const fat=ativos.reduce((s,a)=>s+(a.preco-(a.cbUsado||0)),0);
+  const strip=[];const base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-1);
+  for(let k=0;k<15;k++){const x=new Date(base);x.setDate(base.getDate()+k);strip.push(x)}
+  let rows="",lunchShown=false;
+  for(const a of items){ if(!lunchShown&&toMin(a.hora)>=LOJA.almoco[1]){rows+=`<div class="lunch">Almoço 12:30–13:30</div>`;lunchShown=true}
+    const [l,c]=ST[a.status]||ST.pendente; const bn=barbs().find(b=>b.id===a.barb)?.nome||"Qualquer";
+    rows+=`<div class="ag st-${a.status}"><div class="hr">${a.hora}<small>${hm(toMin(a.hora)+a.min)}</small></div><div style="min-width:0">
+      <div class="between"><b>${esc(a.nome)}</b><span class="pill ${c}">${l}</span></div>
+      <div class="small">${esc(a.servicos.join(" + "))} · ${brl(a.preco-(a.cbUsado||0))}${barbs().length>1?" · "+esc(bn):""}</div>
+      <div class="tiny">${a.pay==="app"?(a.pago?"Pago pelo app ✓":"Pix pelo app · aguardando"):"Paga na barbearia"}${a.cbUsado?" · usou "+brl(a.cbUsado)+" de cashback":""}</div>
+      <div class="acts">
+        ${a.status==="pendente"?`<button class="btn btn-gold btn-sm" data-ast="confirmado" data-id="${a.id}">Confirmar</button>`:""}
+        ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-line btn-sm" data-ast="concluido" data-id="${a.id}">Concluir</button>`:""}
+        ${a.pay==="app"&&!a.pago?`<button class="btn btn-line btn-sm" data-pix="${a.id}">${ic("coin")} QR Pix</button><button class="btn btn-line btn-sm" data-apago="${a.id}">Marcar pago</button>`:""}
+        ${a.fone?`<a class="btn btn-wa btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>`:""}
+        ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-ghost btn-sm" data-ast="faltou" data-id="${a.id}">Faltou</button><button class="btn btn-ghost btn-sm" data-ast="cancelado" data-id="${a.id}">Cancelar</button>`:""}
+      </div></div></div>`;}
+  if(!items.length) rows=`<div class="card empty"><span>${lojaAberta(d)?"Nenhum horário marcado neste dia.":"Barbearia fechada neste dia."}</span></div>`;
+  const amanha=new Date();amanha.setDate(amanha.getDate()+1);const amanhaIso=iso(amanha);
+  const lemb=S.agenda.filter(a=>a.data===amanhaIso&&["pendente","confirmado"].includes(a.status)&&a.fone);
+  return `<div class="days">${strip.map(x=>`<button class="day ${day===iso(x)?"sel":""}" data-aday="${iso(x)}"><small>${DOWS[x.getDay()]}</small><b>${x.getDate()}</b><i>${lojaAberta(x)?S.agenda.filter(a=>a.data===iso(x)&&!["cancelado","faltou"].includes(a.status)).length+" ag.":"fechado"}</i></button>`).join("")}</div>
+  <div class="kpis"><div class="kpi"><b>${ativos.length}</b><span>atendimentos</span></div><div class="kpi"><b class="num" style="font-size:16px">${brl(fat)}</b><span>previsto</span></div><div class="kpi"><b>${items.filter(a=>a.status==="pendente").length}</b><span>a confirmar</span></div></div>
+  ${lemb.length?`<div class="card pad stack"><div class="between"><h3>${ic("bell",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} Lembretes de amanhã</h3><span class="pill warn">${lemb.length}</span></div><p class="tiny" style="margin:0">Um toque abre o WhatsApp do cliente com a mensagem pronta.</p>${lemb.map(a=>`<a class="btn btn-line btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${a.hora} · ${esc(a.nome)}</a>`).join("")}</div>`:""}
+  <div class="between"><h2>${DOW[d.getDay()]}, ${br(day)}</h2><button class="btn btn-gold btn-sm" data-novoag>${ic("plus")} Novo</button></div>
+  <div class="tl">${rows}</div>`;
+}
+function lembrete(a){return `Fala, ${a.nome.split(" ")[0]}! Passando pra lembrar do seu horário na ${LOJA.nome}: ${DOW[fromIso(a.data).getDay()]}, ${br(a.data)} às ${a.hora} (${a.servicos.join(" + ")}). Se precisar cancelar, avisa até 30 min antes. Tamo junto!`}
+function PainelClientes(){
+  if(APP==="adminweb"){
+    const q=S.qcli.trim().toLowerCase();
+    const all=clientesAgg().sort((a,b)=>b.ultima.localeCompare(a.ultima));
+    const cl=all.filter(c=>!q||c.nome.toLowerCase().includes(q)||digits(c.fone).includes(digits(q)||"~"));
+    const I=S.inst||{app:0,visitantes:0,painel:0};
+    return `<div class="kpis"><div class="kpi"><b>${I.app}</b><span>apps instalados</span></div><div class="kpi"><b>${I.visitantes}</b><span>aparelhos que abriram</span></div><div class="kpi"><b>${all.length}</b><span>clientes</span></div></div>
+    <p class="tiny" style="margin:0">Apps instalados contam celulares que abriram a Bárbaros pela tela inicial. Aparelhos que abriram inclui quem usou só pelo navegador.</p>
+    <label class="srch">${ic("user",'style="width:18px;height:18px;color:var(--muted)"')}<input id="qcli" placeholder="Buscar por nome ou telefone" value="${esc(S.qcli)}" autocomplete="off"></label>
+    ${cl.length?`<div class="card">${cl.map(c=>`<button class="cl" data-cli="${esc(c.k)}"><div style="min-width:0"><b>${esc(c.nome)}</b><div class="tiny num">${esc(c.fone)} · ${c.visitas} atendimento${c.visitas===1?"":"s"} · último ${br(c.ultima.slice(0,10))}</div></div><div style="text-align:right;flex:none"><div class="price">${brl(c.gasto)}</div><span class="tiny">${c.cb?"cashback "+brl(c.cb):"ver histórico"}</span></div></button>`).join("")}</div>`:`<div class="card empty">${all.length?"Nenhum cliente encontrado.":"Os clientes aparecem aqui assim que fizerem o primeiro agendamento."}</div>`}`;
+  }
+  const cl=Object.values(S.clientes).sort((a,b)=>(b.ultima||"").localeCompare(a.ultima||""));
+  return `<div class="card pad"><div class="between"><div><span class="eyebrow">Clube Bárbaros</span><h2 style="margin-top:4px">Cashback dos clientes</h2></div><span class="pill mute">${cl.length}</span></div>
+  <p class="tiny" style="margin:8px 0 0">O saldo entra sozinho quando você conclui um atendimento pago pelo app (5%) e sai quando o cliente usa no próximo agendamento.</p></div>
+  ${cl.length?`<div class="card">${cl.map(c=>`<div class="cl"><div style="min-width:0"><b>${esc(c.nome)}</b><div class="tiny num">${esc(c.fone)} · ${c.visitas||0} visita${(c.visitas||0)===1?"":"s"}</div></div><div style="text-align:right"><div class="price">${brl(c.cashback||0)}</div><span class="tiny">saldo</span></div></div>`).join("")}</div>`:`<div class="card empty">Os clientes aparecem aqui conforme os agendamentos forem registrados.</div>`}`;
+}
+function PainelAjustes(){
+  if(APP==="adminweb"){
+    const on=store.get("push",false)&&typeof Notification!=="undefined"&&Notification.permission==="granted";
+    return `<div class="notif">${ic("bell",'style="width:22px;height:22px;color:var(--gold-2);flex:none"')}<div style="flex:1"><b>Notificações ${on?"ativadas":"desativadas"}</b><div class="tiny">${on?"Este celular recebe novos agendamentos, cancelamentos e o resumo do dia seguinte às 18h.":"Ative para receber cada novo agendamento na hora, mesmo com o painel fechado."}</div></div><button class="btn ${on?"btn-line":"btn-gold"} btn-sm" data-avisos>${on?"Testar":"Ativar"}</button></div>
+    <p class="tiny" style="margin:0">No iPhone, as notificações só funcionam com o painel instalado na tela inicial (iOS 16.4 ou mais novo).</p>
+    ${INSTALADO?"":`<button class="btn btn-line" data-instalar>${ic("plus")} Instalar o painel no celular</button>`}
+    <div class="card pad stack"><h3>Regras da agenda</h3><ul class="rules"><li>Ter a sáb, 9h–19h, almoço 12h30–13h30</li><li>Antecedência mínima de 1h · cancelamento até 30 min antes</li><li>Cashback de 5% em pagamentos pelo app</li><li>Pix: ${esc(LOJA.foneTxt)}</li></ul><p class="tiny" style="margin:0">Para mudar regras, preços, equipe ou chave Pix, peça ao Claude.</p></div>
+    <button class="btn btn-ghost" data-sair>Sair do painel</button>`;
+  }
+  return `${INSTALADO?"":`<button class="btn btn-line" data-instalar>${ic("plus")} Instalar o painel no celular</button>`}
+  <div class="card pad stack"><h3>Equipe</h3><p class="tiny" style="margin:0">Quando contratar alguém, adicione aqui. O cliente passa a escolher o barbeiro ou "quem estiver disponível".</p>
+    ${barbs().map(b=>`<div class="between"><b>${esc(b.nome)}</b>${barbs().length>1?`<button class="btn btn-ghost btn-sm" data-rmbarb="${b.id}">Remover</button>`:`<span class="tiny">titular</span>`}</div>`).join("")}
+    <div class="row"><div class="field" style="flex:1"><input id="nbarb" placeholder="Nome do barbeiro" aria-label="Nome do novo barbeiro"></div><button class="btn btn-line" data-addbarb>${ic("plus")} Adicionar</button></div>
+    <div class="field"><label class="small" for="ren">Nome que aparece para o barbeiro titular</label><div class="row"><input id="ren" value="${esc(barbs()[0].nome)}"><button class="btn btn-line" data-renbarb>Salvar</button></div></div></div>
+  <div class="card pad stack"><h3>Pagamento pelo app</h3><div class="field"><label class="small" for="pix">Chave Pix mostrada ao cliente</label><input id="pix" value="${esc(S.cfg.pixChave||"")}" placeholder="+5511944423027"></div>
+    <div class="field"><label class="small" for="end">Endereço da barbearia</label><input id="end" value="${esc(S.cfg.endereco||"")}" placeholder="Rua, número, bairro, cidade"></div>
+    <button class="btn btn-gold" data-savecfg>Salvar</button>
+    <p class="tiny" style="margin:0">Estes ajustes valem para o painel (QR Pix que você mostra no balcão). O app do cliente usa a chave +55 11 94442-3027; para mudar a chave, a equipe ou o endereço lá, peça ao Claude para atualizar o app do cliente.</p></div>
+  <div class="card pad stack"><h3>Regras da agenda</h3><ul class="rules"><li>Ter a sáb, 9h–19h, almoço 12h30–13h30</li><li>Antecedência mínima de 1h · cancelamento até 30 min antes</li><li>Cashback de 5% em pagamentos pelo app</li></ul></div>`;
+}
+function Painel(){
+  const tabsA={agenda:PainelAgenda,clientes:PainelClientes,ajustes:PainelAjustes};
+  return `<section class="screen"><div class="modebar"><span>${ic("scis",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} <b>Painel do Barbeiro</b> · ${S.cloud==="on"?"ao vivo":S.cloud==="erro"?"sem conexão":"conectando…"}</span>${APP==="adminweb"?`<button class="link" data-recarregar>Atualizar ${ic("back",'style="width:14px;height:14px"')}</button>`:`<a class="link" href="${URL_CLIENTE}" target="_blank" rel="noopener">App do cliente ${ic("r",'style="width:14px;height:14px"')}</a>`}</div>
+  ${tabsA[S.aTab]()}</section>`;
+}
+function NovoAg(prefill={}){
+  return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Novo agendamento">
+    <div class="between"><h2>Novo agendamento</h2><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <div class="field"><label class="small" for="paste">Colar mensagem do WhatsApp (preenche sozinho)</label><textarea id="paste" placeholder="*Novo agendamento — Bárbaros Barbershop* …"></textarea><button class="btn btn-line btn-sm" data-parse>Ler mensagem</button></div>
+    <div class="field"><label class="small" for="fn">Cliente</label><input id="fn" value="${esc(prefill.nome||"")}"></div>
+    <div class="field"><label class="small" for="ff">WhatsApp</label><input id="ff" type="tel" value="${esc(prefill.fone||"")}"></div>
+    <div class="field"><label class="small" for="fs">Serviço</label><select id="fs">${SERV.map(s=>`<option value="${s.id}" ${prefill.svc===s.id?"selected":""}>${esc(s.nome)} · ${brl(s.preco)}</option>`).join("")}</select></div>
+    <div class="row"><div class="field" style="flex:1"><label class="small" for="fd">Dia</label><input id="fd" type="date" value="${prefill.data||S.aDay}"></div><div class="field" style="flex:1"><label class="small" for="fh">Hora</label><input id="fh" type="time" step="600" value="${prefill.hora||"09:00"}"></div></div>
+    ${barbs().length>1?`<div class="field"><label class="small" for="fb">Barbeiro</label><select id="fb">${barbs().map(b=>`<option value="${b.id}">${esc(b.nome)}</option>`).join("")}</select></div>`:""}
+    <div class="row"><div class="field" style="flex:1"><label class="small" for="fp">Pagamento</label><select id="fp"><option value="loja" ${prefill.pay!=="app"?"selected":""}>Na barbearia</option><option value="app" ${prefill.pay==="app"?"selected":""}>Pix pelo app</option></select></div><div class="field" style="flex:1"><label class="small" for="fv">Valor (R$)</label><input id="fv" inputmode="decimal" value="${prefill.preco??""}" placeholder="padrão do serviço"></div></div>
+    <div class="field"><label class="small" for="fc">Cashback usado (R$)</label><input id="fc" inputmode="decimal" value="${prefill.cbUsado||""}" placeholder="0"></div>
+    <input type="hidden" id="fid" value="${esc(prefill.id||"")}">
+    <span class="err" id="ferr"></span>
+    <button class="btn btn-gold" data-saveag>${ic("check")} Salvar na agenda</button></div></div>`;
+}
+function parseMsg(t){
+  const g=k=>{const m=t.match(new RegExp("\\*"+k+":\\*\\s*([^\\n]+)","i"));return m?m[1].trim():""};
+  const servTxt=g("Serviço").toLowerCase();
+  const s=SERV.slice().sort((a,b)=>b.nome.length-a.nome.length).find(x=>servTxt.includes(x.nome.toLowerCase()))||(servTxt.includes("corte")&&servTxt.includes("barba")&&servTxt.includes("sobr")?svc("cbs"):servTxt.includes("corte")&&servTxt.includes("barba")?svc("cb"):null);
+  const dm=g("Data").match(/(\d{2})\/(\d{2})\/(\d{4})/);const hmm=g("Horário").match(/(\d{2}:\d{2})/);
+  const val=g("Valor").match(/([\d.,]+)\s*$/);const cb=g("Cashback usado").match(/([\d.,]+)/);
+  return {id:g("Código"),nome:g("Cliente"),fone:g("WhatsApp"),svc:s?.id,data:dm?`${dm[3]}-${dm[2]}-${dm[1]}`:"",hora:hmm?hmm[1]:"",pay:/app|pix pelo/i.test(g("Pagamento"))?"app":"loja",
+    preco:val?Number(val[1].replace(/\./g,"").replace(",",".")):"",cbUsado:cb?Number(cb[1].replace(",",".")):""};
+}
+
+/* ======= lightbox ======= */
+let LB=null;
+function drawOverlay(){
+  const o=document.getElementById("overlay");
+  if(S.sheet){if(drawOverlay.last!==S.sheet){o.innerHTML=S.sheet;drawOverlay.last=S.sheet}document.body.style.overflow="hidden";return}
+  drawOverlay.last=null;
+  if(LB===null){o.innerHTML="";document.body.style.overflow="";return}
+  const p=PF[LB];document.body.style.overflow="hidden";
+  o.innerHTML=`<div class="lb" role="dialog" aria-modal="true" aria-label="${esc(p.t)}"><div class="lb-top"><div><span class="eyebrow">${esc(PF_CATS.find(c=>c.id===p.cat).nome)}</span><h3 style="margin-top:2px">${esc(p.t)}</h3></div><button class="lb-x" data-lbx aria-label="Fechar">${ic("x")}</button></div>
+  <div class="lb-stage"><img src="${IMG[p.img]}" alt="${esc(p.t)}"><button class="lb-n lb-p" data-lbn="-1" aria-label="Anterior">${ic("l")}</button><button class="lb-n lb-nx" data-lbn="1" aria-label="Próxima">${ic("r")}</button></div>
+  <div class="lb-foot"><span class="tiny num" style="text-align:center">${LB+1} de ${PF.length}</span><button class="btn btn-gold" data-lbgo>${ic("cal")} Agendar esse estilo</button></div></div>`;
+}
+
+function Bloqueado(){
+  const carregando=S.cloud==="off";
+  return `<section class="screen" style="min-height:80vh;justify-content:center"><div class="card okc"><span class="ic">${ic("scis")}</span><h1>Painel do Barbeiro</h1>
+  <p class="muted" style="margin:0">${carregando?"Carregando…":"Área restrita. Só o dono da Bárbaros (ou quem ele der acesso de edição) pode abrir este painel."}</p>
+  ${carregando?"":`<a class="btn btn-gold" href="${URL_CLIENTE}" target="_blank" rel="noopener">${ic("cal")} Ir para o app de agendamento</a>`}</div></section>`;
+}
+function Instalar(){
+  const ua=navigator.userAgent||"",ios=/iPhone|iPad|iPod/i.test(ua),and=/Android/i.test(ua);
+  const nome=APP==="admin"?"Bárbaros Painel":"Bárbaros";
+  const iosSteps=`<ol class="rules"><li>Abra este link no <b>Safari</b>.</li><li>Toque em <b>Compartilhar</b> (o quadrado com a seta para cima).</li><li>Escolha <b>Adicionar à Tela de Início</b> e confirme com o nome <b>${nome}</b>.</li></ol>`;
+  const andSteps=`<ol class="rules"><li>Abra este link no <b>Chrome</b>.</li><li>Toque no menu <b>⋮</b> no canto de cima.</li><li>Escolha <b>Adicionar à tela inicial</b> (ou <b>Instalar app</b>) e confirme com o nome <b>${nome}</b>.</li></ol>`;
+  return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Instalar no celular">
+    <div class="between"><div><span class="eyebrow">Atalho no celular</span><h2 style="margin-top:4px">Instalar ${nome}</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <p class="small" style="margin:0">O app ganha um ícone na tela inicial do celular e abre direto, como um aplicativo.</p>
+    ${ios||!and?`<div class="card pad stack"><h3>iPhone</h3>${iosSteps}</div>`:""}
+    ${and||!ios?`<div class="card pad stack"><h3>Android</h3>${andSteps}</div>`:""}
+    <button class="btn btn-line" data-copy="${APP==="admin"?"https://claude.ai/artifact/7Y6D9iMtdH4igw1ggPycoR":URL_CLIENTE}" data-msg="Link copiado">${ic("copy")} Copiar link do app</button>
+    <p class="tiny" style="margin:0">Se o app abriu dentro do Instagram ou do WhatsApp, toque nos três pontinhos e escolha <b>Abrir no navegador</b> antes.</p></div></div>`;
+}
+/* ======= render ======= */
+const TABS_C=[["inicio","Início","home"],["servicos","Serviços","scis"],["agendar","Agendar","cal"],["portfolio","Portfólio","gal"],["conta","Conta","user"]];
+const TABS_A=[["agenda","Agenda","cal"],["clientes","Clientes","crown"],["ajustes","Ajustes","gear"]];
+let ULTIMA_TELA="";
+function render(){
+  const app=document.getElementById("app"),ae=document.activeElement,fid=ae&&ae.id,pos=ae&&ae.selectionStart,y=window.scrollY;
+  const tela=APP==="adminweb"?(S.auth==="ok"?"a:"+S.aTab:"login"):APP==="admin"?"a:"+S.aTab:"c:"+S.tab+":"+(S.tab==="agendar"?(S.done?"ok":S.step):"");
+  if(APP==="adminweb"&&S.auth!=="ok"){app.innerHTML=Login();document.getElementById("tabs").innerHTML="";document.getElementById("cartbar").innerHTML="";}
+  else if(APP==="adminweb"){app.innerHTML=Painel();
+    document.getElementById("tabs").style.gridTemplateColumns="repeat(3,1fr)";
+    document.getElementById("tabs").innerHTML=TABS_A.map(([id,l,i])=>`<button class="tab" data-atab="${id}" ${S.aTab===id?'aria-current="page"':""}><span class="ti">${ic(i)}</span>${l}</button>`).join("");
+    document.getElementById("cartbar").innerHTML="";
+  }
+  else if(APP==="admin"&&!S.isAdmin){app.innerHTML=Bloqueado();document.getElementById("tabs").innerHTML="";document.getElementById("cartbar").innerHTML="";}
+  else if(APP==="admin"){app.innerHTML=Painel();
+    document.getElementById("tabs").style.gridTemplateColumns="repeat(3,1fr)";
+    document.getElementById("tabs").innerHTML=TABS_A.map(([id,l,i])=>`<button class="tab" data-atab="${id}" ${S.aTab===id?'aria-current="page"':""}><span class="ti">${ic(i)}</span>${l}</button>`).join("");
+    document.getElementById("cartbar").innerHTML="";
+  }else{
+    app.innerHTML={inicio:Inicio,servicos:Servicos,agendar:Agendar,portfolio:Portfolio,conta:Conta}[S.tab]();
+    document.getElementById("tabs").style.gridTemplateColumns="";
+    const prox=S.meus.filter(b=>b.status!=="cancelado"&&new Date(b.data+"T"+b.hora)>=new Date()).length;
+    document.getElementById("tabs").innerHTML=TABS_C.map(([id,l,i])=>`<button class="tab" data-go="${id}" ${S.tab===id?'aria-current="page"':""}><span class="ti">${ic(i)}</span>${l}${id==="conta"&&prox?`<span class="bd">${prox}</span>`:""}${id==="agendar"&&S.sel.size&&S.tab!=="agendar"?`<span class="bd">${S.sel.size}</span>`:""}</button>`).join("");
+    const {preco,min,aPartir}=totals();
+    document.getElementById("cartbar").innerHTML=S.sel.size&&["inicio","servicos"].includes(S.tab)?`<div class="cartbar"><div class="s"><b class="num">${aPartir?"a partir de ":""}${brl(preco)}</b><br>${[...S.sel].map(id=>svc(id).nome).join(" + ")} · ${dur(min)}</div><button class="btn btn-gold" data-go="agendar" data-skip="1">Escolher horário ${ic("r")}</button></div>`:"";
+  }
+  app.style.paddingBottom=document.getElementById("cartbar").innerHTML?"calc(170px + env(safe-area-inset-bottom,0px))":"";
+  const scr=app.querySelector(".screen");
+  if(tela!==ULTIMA_TELA){if(scr)scr.classList.add("anim");ULTIMA_TELA=tela}else{window.scrollTo(0,y)}
+  if(fid){const el=document.getElementById(fid);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
+  drawOverlay();
+}
+
+function partes(x){const v=svc(x);return v.combo||[v.id]}
+function tog(id){
+  const s=svc(id);
+  if(S.sel.has(id)){S.sel.delete(id)}else{
+    const meu=partes(id),trocados=[];
+    for(const x of [...S.sel]){const o=svc(x);
+      if((s.grupo&&o.grupo===s.grupo)||partes(x).some(p=>meu.includes(p))){S.sel.delete(x);trocados.push(o.nome)}}
+    S.sel.add(id);
+    if(trocados.length) toast("Trocado: "+trocados.join(", ")+" → "+s.nome);
+  }
+  S.time=null;render();
+}
+
+async function confirmar(){
+  S.err={};
+  if(!S.nome.trim())S.err.nome=1;
+  if(digits(S.fone).length<10)S.err.fone=1;
+  if(S.err.nome||S.err.fone){render();document.getElementById(S.err.nome?"nome":"fone").focus();return}
+  store.set("nome",S.nome.trim());store.set("fone",S.fone.trim());
+  const {list,preco,min,aPartir}=totals();
+  const saldo=cbSaldo(),usa=S.useCb&&saldo>0?Math.min(saldo,preco):0;
+  const barbId=S.barb==="qualquer"?(livre(S.date,S.time,S.time+min,"qualquer")||barbs()[0].id):S.barb;
+  const b={id:S.pid||uid(),servicos:list.map(s=>s.nome),svcIds:list.map(s=>s.id),preco,min,aPartir,data:S.date,hora:hm(S.time),barb:S.barb==="qualquer"?"qualquer":barbId,
+    barbNome:S.barb==="qualquer"?"Quem estiver disponível":barbs().find(x=>x.id===S.barb).nome,pay:S.pay,cbUsado:usa,cbGanho:S.pay==="app"?Math.round((preco-usa)*LOJA.cashback*100)/100:0,
+    nome:S.nome.trim(),fone:S.fone.trim(),status:"pendente",criado:new Date().toISOString()};
+  if(usa){let rest=usa;for(const m of S.meus){if(rest<=0)break;if(m.cbGanho&&!m.cbUsadoEm&&new Date(m.data+"T"+m.hora)<new Date()){m.cbUsadoEm=b.id;rest-=m.cbGanho}}}
+  if(API){
+    if(S.enviando)return;S.enviando=true;render();
+    try{const j=await api("/agendar",{method:"POST",body:JSON.stringify({...b,barb:S.barb==="qualquer"?"":S.barb,device:DEV})});
+      b.id=j.id;b.cbUsado=j.cbUsado;b.registrado=true;
+      if(store.get("push",false)&&typeof Notification!=="undefined"&&Notification.permission==="granted"){inscreverPush().then(sub=>sub&&api("/sub",{method:"POST",body:JSON.stringify({fone:b.fone,sub})})).catch(()=>{})}
+    }catch(err){S.enviando=false;
+      if(err.status===409||err.status===400){toast(err.message);await carregaOcupados();if(err.status===409){S.step=3;S.time=null}render();return}
+      b.registrado=false}
+    S.enviando=false;carregaOcupados();
+  }
+  S.meus.push(b);store.set("meus",S.meus);
+  if(!API)openLink(waTo(LOJA.wa,msgAgendamento(b)));
+  if(!API&&S.db&&S.isAdmin){try{await saveAg({...b,barb:barbId})}catch(e){}}
+  S.done=b;S.pid=null;S.sel=new Set();S.step=1;S.date=null;S.time=null;S.useCb=false;render();window.scrollTo({top:0});
+}
+
+/* ======= painel web (Vercel) ======= */
+let BK=store.get("bkcache",{});
+const adm=(b)=>api("/admin",{method:"POST",headers:{"x-pin":S.pin},body:JSON.stringify(b)});
+async function carregaAdmin(silencioso){
+  if(!S.pin){S.auth="nao";render();return}
+  if(!silencioso&&S.auth!=="ok"){S.auth="carregando";render()}
+  try{
+    const j=await api("/admin",{headers:{"x-pin":S.pin}});
+    const falt=j.items.filter(i=>!BK[i.id]).map(i=>i.id);
+    for(let k=0;k<falt.length;k+=60){const r=await adm({action:"get",ids:falt.slice(k,k+60)});Object.assign(BK,r.docs||{})}
+    if(falt.length)store.set("bkcache",BK);
+    S.agenda=j.items.filter(i=>BK[i.id]).map(i=>({...BK[i.id],id:i.id,status:i.status,pago:i.pago}));
+    S.inst=j.installs;S.auth="ok";S.cloud="on";S.loginErr="";store.set("pin",S.pin);
+  }catch(e){
+    if(e.status===401){S.pin="";store.set("pin","");S.auth="nao";S.loginErr="PIN incorreto."}
+    else{S.cloud="erro";if(S.auth!=="ok"){S.auth="nao";S.loginErr="Sem conexão com o servidor. Tente de novo."}}
+  }
+  render();
+}
+async function setStatusWeb(id,st){
+  const a=S.agenda.find(x=>x.id===id);if(!a||S.busy[id])return;S.busy[id]=1;
+  try{await adm({action:"status",id,status:st});a.status=st;toast(ST[st][0]+(st==="confirmado"?" · cliente avisado":""));render()}catch(e){toast(e.message||"Não foi possível salvar.")}
+  delete S.busy[id];
+}
+async function ativarAvisosAdmin(){
+  try{const sub=await inscreverPush();if(!sub)return;await adm({action:"sub",sub});store.set("push",true);await adm({action:"teste"});toast("Notificações ativadas neste celular");render()}catch(e){toast("Não deu para ativar: "+(e.message||"erro"))}
+}
+function clientesAgg(){
+  const m={};
+  for(const a of S.agenda){
+    const k=digits(a.fone).slice(-11)||("x"+a.nome);
+    const c=m[k]||(m[k]={k,nome:a.nome,fone:a.fone,itens:[],visitas:0,gasto:0,cb:0,ultima:"",faltas:0});
+    c.itens.push(a);
+    const val=(a.preco||0)-(a.cbUsado||0);
+    if(a.status==="concluido"){c.visitas++;c.gasto+=val;if(a.pay==="app")c.cb+=Math.round(val*LOJA.cashback*100)/100}
+    if(a.status==="faltou")c.faltas++;
+    if(a.status!=="cancelado")c.cb-=a.cbUsado||0;
+    if((a.data+a.hora)>c.ultima){c.ultima=a.data+a.hora;c.nome=a.nome}
+  }
+  return Object.values(m).map(c=>({...c,cb:Math.max(0,Math.round(c.cb*100)/100)}));
+}
+function ClienteSheet(k){
+  const c=clientesAgg().find(x=>x.k===k);if(!c)return "";
+  const itens=c.itens.slice().sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));
+  return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Histórico do cliente">
+    <div class="between"><div><span class="eyebrow">Histórico do cliente</span><h2 style="margin-top:4px">${esc(c.nome)}</h2><span class="tiny num">${esc(c.fone)}</span></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <div class="kpis"><div class="kpi"><b>${c.visitas}</b><span>atendimentos</span></div><div class="kpi"><b class="num" style="font-size:15px">${brl(c.gasto)}</b><span>gasto total</span></div><div class="kpi"><b class="num" style="font-size:15px">${brl(c.cb)}</b><span>cashback</span></div></div>
+    ${c.faltas?`<div class="note">Faltou ${c.faltas} vez${c.faltas>1?"es":""}.</div>`:""}
+    <div class="hist">${itens.map(a=>{const[l,cl]=ST[a.status]||ST.pendente;return `<div class="it"><div style="min-width:0"><b>${esc(a.servicos.join(" + "))}</b><div class="tiny num">${DOWS[fromIso(a.data).getDay()]} ${br(a.data)} · ${a.hora} · ${a.pay==="app"?"Pix app":"na loja"}</div></div><div style="text-align:right;flex:none"><div class="price" style="font-size:14px">${brl((a.preco||0)-(a.cbUsado||0))}</div><span class="pill ${cl}">${l}</span></div></div>`}).join("")}</div>
+    ${digits(c.fone).length>=10?`<a class="btn btn-wa" href="https://wa.me/55${digits(c.fone).slice(-11)}" target="_blank" rel="noopener">${ic("wa")} Conversar no WhatsApp</a>`:""}
+  </div></div>`;
+}
+function Login(){
+  const carregando=S.auth==="carregando";
+  return `<section class="screen anim" style="min-height:78vh;justify-content:center"><div class="card okc">
+    <span class="ic">${ic("scis")}</span><h1>Painel do Barbeiro</h1>
+    <p class="muted" style="margin:0">${carregando?"Carregando a agenda…":"Digite o PIN do painel para entrar."}</p>
+    ${carregando?"":`<form class="stack w100" data-login><div class="field"><input id="pinin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN de 8 dígitos" aria-label="PIN do painel" style="text-align:center;letter-spacing:.3em;font-size:20px"></div>${S.loginErr?`<span class="err">${esc(S.loginErr)}</span>`:""}<button class="btn btn-gold" type="submit">Entrar</button></form>`}
+  </div></section>`;
+}
+
+/* ======= nuvem (somente barbeiro / equipe) ======= */
+const P={ag:"private/agenda/ag",cl:"private/agenda/clientes",cfg:"public/config",oc:"public/ocupados"};
+async function saveAg(a){
+  if(APP==="adminweb"){await adm({action:"novo",booking:a});await carregaAdmin(true);return}
+  const prev=S.agenda.find(x=>x.id===a.id);
+  await S.db.collection(P.ag).doc(a.id).set(a);
+  if(!prev&&a.cbUsado&&a.fone){await ajustaCliente(a,-a.cbUsado,0)} else if(a.fone){await ajustaCliente(a,0,0)}
+}
+async function ajustaCliente(a,delta,visita){
+  const k=digits(a.fone).slice(-11);if(!k)return;
+  const c=S.clientes[k]||{nome:a.nome,fone:a.fone,cashback:0,visitas:0};
+  const novo={nome:a.nome||c.nome,fone:a.fone||c.fone,cashback:Math.max(0,Math.round(((c.cashback||0)+delta)*100)/100),visitas:(c.visitas||0)+visita,ultima:a.data};
+  S.clientes[k]=novo;await S.db.collection(P.cl).doc(k).set(novo);
+}
+let ocT;function publicaOcupados(){clearTimeout(ocT);ocT=setTimeout(async()=>{
+  const hoje=iso(new Date()),o={};
+  for(const a of S.agenda){if(a.data<hoje||["cancelado","faltou"].includes(a.status))continue;(o[a.data]=o[a.data]||[]).push({i:toMin(a.hora),f:toMin(a.hora)+a.min,b:a.barb==="qualquer"?barbs()[0].id:a.barb})}
+  const s=JSON.stringify(o);if(s===publicaOcupados.last)return;publicaOcupados.last=s;
+  try{await S.db.doc(P.oc).set({dias:o,atualizado:new Date().toISOString()})}catch(e){}
+},800)}
+async function setStatus(id,st){
+  if(APP==="adminweb")return setStatusWeb(id,st);
+  const a=S.agenda.find(x=>x.id===id);if(!a||S.busy[id])return;S.busy[id]=1;
+  try{const upd={status:st};
+    if(st==="concluido"&&a.status!=="concluido"){const ganho=a.pay==="app"?Math.round((a.preco-(a.cbUsado||0))*LOJA.cashback*100)/100:0;upd.cbCreditado=ganho;await ajustaCliente(a,ganho,1)}
+    if(st==="cancelado"&&a.cbUsado&&a.status!=="cancelado"){await ajustaCliente(a,a.cbUsado,0)}
+    await S.db.collection(P.ag).doc(id).update(upd);toast(ST[st][0])}catch(e){toast("Não foi possível salvar. Tente de novo.")}
+  delete S.busy[id];
+}
+async function initCloud(){
+  const c=window.claude; if(!c||!c.use) return;
+  const [db,user]=await Promise.all([c.use("db"),c.use("user")]);
+  S.db=db;S.user=user;
+  if(user){try{S.isAdmin=(await user.isOwner())||(await user.canEdit())}catch(e){}}
+  if(!db){render();return}
+  db.doc(P.cfg).onSnapshot(s=>{if(s.exists){const d=s.data();S.cfg={barbeiros:d.barbeiros&&d.barbeiros.length?d.barbeiros:BARB_PADRAO,pixChave:d.pixChave||"",endereco:d.endereco||""}}render()},()=>{});
+  db.doc(P.oc).onSnapshot(s=>{OCUP=s.exists?(s.data().dias||{}):{};render()},()=>{});
+  if(S.isAdmin){
+    db.collection(P.ag).onSnapshot(q=>{S.agenda=q.docs.map(d=>({...d.data(),id:d.id}));S.cloud="on";publicaOcupados();render()},()=>{S.cloud="erro";render()});
+    db.collection(P.cl).onSnapshot(q=>{const m={};q.docs.forEach(d=>m[d.id]=d.data());S.clientes=m;render()},()=>{});
+  }
+  render();
+}
+async function saveCfg(patch){
+  const cur={barbeiros:barbs(),pixChave:S.cfg.pixChave||"",endereco:S.cfg.endereco||"",...patch};
+  try{await S.db.doc(P.cfg).set(cur);S.cfg=cur;toast("Salvo");render()}catch(e){toast("Não foi possível salvar.")}
+}
+
+/* ======= eventos ======= */
+document.addEventListener("click",async e=>{
+  if(e.target.closest('[data-olhos]')){const h=e.target.closest('[data-olhos]');h.classList.add('acesa');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('acesa'),2500)}
+  const t=e.target.closest("button,a,[data-close]");if(!t)return;const d=t.dataset;
+  if(d.close!==undefined&&e.target===t){S.sheet=null;drawOverlay();return}
+  if(t.tagName==="A")return;
+  if(d.go){if(d.go==="conta")syncMeus();S.tab=d.go;if(d.go==="agendar"&&d.skip&&S.sel.size){S.step=2;S.done=null}if(d.go==="agendar"&&S.done&&!d.skip){}render();window.scrollTo({top:0});return}
+  if(d.cat){S.cat=d.cat;render();return}
+  if(d.pfc){S.pfCat=d.pfc;render();return}
+  if(d.tog){tog(d.tog);return}
+  if(d.next!==undefined){S.step++;if(S.step===3)carregaOcupados();render();window.scrollTo({top:0});return}
+  if(d.avisos!==undefined){if(APP==="adminweb")ativarAvisosAdmin();else ativarAvisosCliente();return}
+  if(d.prev!==undefined){S.step--;render();return}
+  if(d.barb){S.barb=d.barb;S.time=null;render();return}
+  if(d.date){S.date=d.date;S.time=null;render();return}
+  if(d.time){S.time=+d.time;render();return}
+  if(d.pay){S.pay=d.pay;render();return}
+  if(d.pixnow!==undefined){const {list,preco,min,aPartir}=totals();const saldo=cbSaldo(),usa=S.useCb&&saldo>0?Math.min(saldo,preco):0;S.pid=S.pid||uid();
+    S.sheet=PixSheet({id:S.pid,servicos:list.map(x=>x.nome),preco,cbUsado:usa,min,aPartir,data:S.date,hora:hm(S.time),nome:S.nome.trim()||"Cliente"});drawOverlay();return}
+  if(d.usecb!==undefined){S.useCb=!S.useCb;render();return}
+  if(d.confirm!==undefined){confirmar();return}
+  if(d.novo!==undefined){S.done=null;S.step=1;render();return}
+  if(d.copy){copy(d.copy,d.msg||"Copiado");return}
+  if(d.instalar!==undefined){if(window.__bip){const ev=window.__bip;window.__bip=null;ev.prompt();try{const r=await ev.userChoice;if(r.outcome==="accepted")toast("App instalado")}catch(x){}render();return}S.sheet=Instalar();drawOverlay();return}
+  if(d.pix){const b=S.meus.find(x=>x.id===d.pix)||(S.done&&S.done.id===d.pix?S.done:null)||S.agenda.find(x=>x.id===d.pix);if(b){S.sheet=PixSheet(b);drawOverlay()}return}
+  if(d.cancel){const b=S.meus.find(x=>x.id===d.cancel);if(!b)return;
+    if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent="Toque de novo para cancelar";setTimeout(()=>{if(t.isConnected){t.dataset.armed="";t.textContent="Cancelar"}},4000);return}
+    if(API){try{await api("/cancelar",{method:"POST",body:JSON.stringify({id:b.id,fone:b.fone})});b.status="cancelado";store.set("meus",S.meus);toast("Horário cancelado. A barbearia já foi avisada.");syncMeus();render()}catch(err){toast(err.message)}return}
+    b.status="cancelado";if(b.cbUsado){S.meus.forEach(m=>{if(m.cbUsadoEm===b.id)delete m.cbUsadoEm})}store.set("meus",S.meus);
+    openLink(waTo(LOJA.wa,`*Cancelamento — ${LOJA.nome}*\n\n*Código:* ${b.id}\n*Cliente:* ${b.nome}\n*Era:* ${br(b.data)} às ${b.hora} (${b.servicos.join(" + ")})\n\nPreciso cancelar esse horário.`));
+    if(S.db&&S.isAdmin&&S.agenda.some(a=>a.id===b.id))setStatus(b.id,"cancelado");
+    toast("Horário cancelado. Envie a mensagem no WhatsApp.");render();return}
+  if(d.lb!==undefined){LB=+d.lb;drawOverlay();return}
+  if(d.lbx!==undefined){LB=null;drawOverlay();return}
+  if(d.lbn){LB=(LB+ +d.lbn+PF.length)%PF.length;drawOverlay();return}
+  if(d.lbgo!==undefined){LB=null;S.tab="agendar";S.done=null;render();window.scrollTo({top:0});return}
+  // admin
+  if(d.mode){S.mode=d.mode;render();window.scrollTo({top:0});return}
+  if(d.atab){S.aTab=d.atab;render();return}
+  if(d.aday){S.aDay=d.aday;render();return}
+  if(d.ast){setStatus(d.id,d.ast);return}
+  if(d.apago&&APP==="adminweb"){try{await adm({action:"pago",id:d.apago});const a=S.agenda.find(x=>x.id===d.apago);if(a)a.pago=true;toast("Pagamento registrado");render()}catch(err){toast("Não foi possível salvar.")}return}
+  if(d.cli){S.sheet=ClienteSheet(d.cli);drawOverlay();return}
+  if(d.sair!==undefined){S.pin="";store.set("pin","");S.auth="nao";S.agenda=[];render();return}
+  if(d.recarregar!==undefined){carregaAdmin(true).then(()=>toast("Agenda atualizada"));return}
+  if(d.apago){try{await S.db.collection(P.ag).doc(d.apago).update({pago:true});toast("Pagamento registrado")}catch(err){toast("Não foi possível salvar.")}return}
+  if(d.novoag!==undefined){S.sheet=NovoAg();drawOverlay();return}
+  if(d.closesheet!==undefined){S.sheet=null;drawOverlay();return}
+  if(d.parse!==undefined){const p=parseMsg(document.getElementById("paste").value);if(!p.nome&&!p.data){toast("Não reconheci a mensagem. Cole a mensagem completa do app.");return}S.sheet=NovoAg(p);drawOverlay();toast("Dados preenchidos. Confira e salve.");return}
+  if(d.saveag!==undefined){
+    const v=id=>document.getElementById(id)?.value?.trim()||"";const s=svc(v("fs"));const err=document.getElementById("ferr");
+    if(!v("fn")||!v("fd")||!v("fh")){err.textContent="Preencha cliente, dia e hora.";return}
+    const preco=v("fv")?Number(v("fv").replace(",",".")):s.preco;const cbu=v("fc")?Number(v("fc").replace(",",".")):0;
+    const a={id:v("fid")||"",nome:v("fn"),fone:v("ff"),servicos:[s.nome],svcIds:[s.id],preco:isNaN(preco)?s.preco:preco,min:s.min,aPartir:!!s.aPartir,data:v("fd"),hora:v("fh"),
+      barb:document.getElementById("fb")?.value||barbs()[0].id,pay:v("fp"),cbUsado:isNaN(cbu)?0:cbu,status:"confirmado",pago:false,criado:new Date().toISOString()};
+    const fim=toMin(a.hora)+a.min,dia=fromIso(a.data);
+    const avisos=[];if(!lojaAberta(dia))avisos.push("dia fechado");if(toMin(a.hora)<LOJA.almoco[1]&&fim>LOJA.almoco[0])avisos.push("cai no almoço");if(fim>LOJA.fim)avisos.push("passa das 19h");
+    if(S.agenda.some(x=>x.id!==a.id&&x.data===a.data&&!["cancelado","faltou"].includes(x.status)&&(x.barb===a.barb||x.barb==="qualquer")&&toMin(a.hora)<toMin(x.hora)+x.min&&fim>toMin(x.hora)))avisos.push("conflita com outro horário");
+    if(avisos.length&&t.dataset.armed!=="1"){t.dataset.armed="1";err.textContent="Atenção: "+avisos.join(", ")+". Toque em salvar de novo para manter.";return}
+    if(APP!=="adminweb"&&!a.id)a.id=uid();
+    try{t.disabled=true;await saveAg(a);S.sheet=null;S.aDay=a.data;toast("Agendamento salvo");render()}catch(x){t.disabled=false;err.textContent="Não foi possível salvar. Tente de novo."}
+    return}
+  if(d.addbarb!==undefined){const n=document.getElementById("nbarb").value.trim();if(!n)return;saveCfg({barbeiros:[...barbs(),{id:"b"+Date.now().toString(36),nome:n}]});return}
+  if(d.rmbarb){saveCfg({barbeiros:barbs().filter(b=>b.id!==d.rmbarb)});return}
+  if(d.renbarb!==undefined){const n=document.getElementById("ren").value.trim();if(!n)return;const l=barbs().slice();l[0]={...l[0],nome:n};saveCfg({barbeiros:l});return}
+  if(d.savecfg!==undefined){saveCfg({pixChave:document.getElementById("pix").value.trim(),endereco:document.getElementById("end").value.trim()});return}
+});
+function maskFone(v){v=digits(v).slice(0,11);if(v.length>7)return`(${v.slice(0,2)}) ${v.slice(2,3)} ${v.slice(3,7)}-${v.slice(7)}`;if(v.length>3)return`(${v.slice(0,2)}) ${v.slice(2,3)} ${v.slice(3)}`;if(v.length>2)return`(${v.slice(0,2)}) ${v.slice(2)}`;return v}
+document.addEventListener("submit",e=>{if(e.target.matches("[data-login]")){e.preventDefault();const v=digits(document.getElementById("pinin").value);if(!v)return;S.pin=v;S.loginErr="";carregaAdmin()}});
+document.addEventListener("input",e=>{const id=e.target.id;
+  if(id==="qcli"){S.qcli=e.target.value;render();return}
+  if(id==="nome"||id==="cnome"){S.nome=e.target.value;store.set("nome",S.nome.trim());if(S.err.nome&&S.nome.trim()){S.err.nome=0}}
+  if(id==="fone"||id==="cfone"||id==="ff"){e.target.value=maskFone(e.target.value);if(id!=="ff"){S.fone=e.target.value;store.set("fone",S.fone)}}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(S.sheet){S.sheet=null;drawOverlay()}else if(LB!==null){LB=null;drawOverlay()}}
+  if(LB!==null&&!S.sheet){if(e.key==="ArrowRight"){LB=(LB+1)%PF.length;drawOverlay()}if(e.key==="ArrowLeft"){LB=(LB-1+PF.length)%PF.length;drawOverlay()}}});
+let tx=null;document.addEventListener("touchstart",e=>{if(LB!==null)tx=e.touches[0].clientX},{passive:true});
+document.addEventListener("touchend",e=>{if(LB===null||tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){LB=(LB+(dx<0?1:-1)+PF.length)%PF.length;drawOverlay()}tx=null});
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();window.__bip=e;render()});
+addEventListener("appinstalled",()=>{window.__bip=null;toast("App instalado na tela inicial");registraAparelho("app")});
+const INSTALADO=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;
+const h=(location.hash||"").slice(1);if(TABS_C.some(x=>x[0]===h))S.tab=h;
+if(APP==="admin"){render();initCloud().finally(()=>{if(S.cloud==="off")S.cloud="pronto";render()})}
+else if(APP==="adminweb"){render();carregaAdmin();registraAparelho(INSTALADO?"app":"web");
+  setInterval(()=>{if(document.visibilityState==="visible"&&S.auth==="ok")carregaAdmin(true)},20000);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.auth==="ok")carregaAdmin(true)});
+  if("serviceWorker" in navigator)navigator.serviceWorker.addEventListener("message",e=>{if(e.data==="atualizar"&&S.auth==="ok")carregaAdmin(true)})}
+else{render();if(API){registraAparelho(INSTALADO?"app":"web");carregaOcupados();syncMeus();
+  setInterval(()=>{if(document.visibilityState==="visible"){if(S.tab==="agendar"&&S.step===3)carregaOcupados();if(S.tab==="conta")syncMeus()}},30000);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){syncMeus();carregaOcupados()}})}}
+</script>
+
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}))}</script>
+</body>
+</html>

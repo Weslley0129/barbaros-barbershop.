@@ -1,4 +1,11 @@
 {
+ "cleanUrls": true,
+ "crons": [
+  {
+   "path": "/api/lembretes",
+   "schedule": "0 21 * * *"
+  }
+ ],
  "headers": [
   {
    "source": "/sw.js",
@@ -14,11 +21,20 @@
    ]
   },
   {
-   "source": "/manifest.webmanifest",
+   "source": "/(.*).webmanifest",
    "headers": [
     {
      "key": "Content-Type",
      "value": "application/manifest+json"
+    }
+   ]
+  },
+  {
+   "source": "/painel",
+   "headers": [
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex"
     }
    ]
   }
