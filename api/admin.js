@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { temArmazenamento, SEM_ARMAZENAMENTO, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
+import { temArmazenamento, SEM_ARMAZENAMENTO, remove, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
   STATUS, LOJA, subValida, subHash, pushAdmin, pushCliente, quando } from "../lib/core.js";
 // API do Painel do Barbeiro, protegida por PIN.
 function autorizado(req) {
@@ -47,6 +47,12 @@ export default async function handler(req, res) {
         cbGanho: a.pay === "app" ? Math.round((preco - cbUsado) * LOJA.cashback * 100) / 100 : 0, criado: new Date().toISOString(), origem: "painel" };
       await putJSON(bookingPath(doc), doc); await setStatus(id, "confirmado");
       return send(res, 200, { ok: true, id });
+    }
+    if (b.action === "apagar") {
+      const id = String(b.id || ""); if (!/^[A-Z0-9]{5,12}$/.test(id)) return send(res, 400, { erro: "Código inválido." });
+      const alvo = [...(await index()).filter(x => x.id === id).map(x => x.path), ...(await listAll(`st/${id}/`)).map(x => x.pathname), ...(await listAll(`pago/${id}.json`)).map(x => x.pathname), ...(await listAll(`lemb/${id}.json`)).map(x => x.pathname)];
+      for (const p of alvo) await remove(p);
+      return send(res, 200, { ok: true, apagados: alvo.length });
     }
     if (b.action === "sub") {
       if (!subValida(b.sub)) return send(res, 400, { erro: "Inscrição inválida." });

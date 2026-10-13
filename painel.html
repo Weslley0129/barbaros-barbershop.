@@ -666,6 +666,7 @@ function PainelAgenda(){
         ${a.pay==="app"&&!a.pago?`<button class="btn btn-line btn-sm" data-pix="${a.id}">${ic("coin")} QR Pix</button><button class="btn btn-line btn-sm" data-apago="${a.id}">Marcar pago</button>`:""}
         ${a.fone?`<a class="btn btn-wa btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${ic("bell")} Lembrete</a>`:""}
         ${["pendente","confirmado"].includes(a.status)?`<button class="btn btn-ghost btn-sm" data-ast="faltou" data-id="${a.id}">Faltou</button><button class="btn btn-ghost btn-sm" data-ast="cancelado" data-id="${a.id}">Cancelar</button>`:""}
+        ${APP==="adminweb"&&a.status==="cancelado"?`<button class="btn btn-ghost btn-sm" data-apagar="${a.id}">Apagar</button>`:""}
       </div></div></div>`;}
   if(!items.length) rows=`<div class="card empty"><span>${lojaAberta(d)?"Nenhum horário marcado neste dia.":"Barbearia fechada neste dia."}</span></div>`;
   const amanha=new Date();amanha.setDate(amanha.getDate()+1);const amanhaIso=iso(amanha);
@@ -1003,6 +1004,8 @@ document.addEventListener("click",async e=>{
   if(d.ast){setStatus(d.id,d.ast);return}
   if(d.apago&&APP==="adminweb"){try{await adm({action:"pago",id:d.apago});const a=S.agenda.find(x=>x.id===d.apago);if(a)a.pago=true;toast("Pagamento registrado");render()}catch(err){toast("Não foi possível salvar.")}return}
   if(d.cli){S.sheet=ClienteSheet(d.cli);drawOverlay();return}
+  if(d.apagar){if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent="Toque de novo para apagar";setTimeout(()=>{if(t.isConnected){t.dataset.armed="";t.textContent="Apagar"}},4000);return}
+    try{await adm({action:"apagar",id:d.apagar});delete BK[d.apagar];store.set("bkcache",BK);S.agenda=S.agenda.filter(x=>x.id!==d.apagar);toast("Agendamento apagado");render()}catch(err){toast(err.message||"Não foi possível apagar.")}return}
   if(d.sair!==undefined){S.pin="";store.set("pin","");S.auth="nao";S.agenda=[];render();return}
   if(d.recarregar!==undefined){carregaAdmin(true).then(()=>toast("Agenda atualizada"));return}
   if(d.apago){try{await S.db.collection(P.ag).doc(d.apago).update({pago:true});toast("Pagamento registrado")}catch(err){toast("Não foi possível salvar.")}return}
