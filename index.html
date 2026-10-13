@@ -979,7 +979,9 @@ async function carregaAdmin(silencioso){
   if(!S.pin){S.auth="nao";render();return}
   if(!silencioso&&S.auth!=="ok"){S.auth="carregando";render()}
   try{
-    const j=await api("/admin",{headers:{"x-pin":S.pin}});
+    const j=await api("/admin"+(silencioso&&S.ver?"?v="+encodeURIComponent(S.ver):""),{headers:{"x-pin":S.pin}});
+    if(j.mesmo){S.cloud="on";if(S.auth!=="ok")S.auth="ok";render();return}
+    S.ver=j.v||"";
     const falt=j.items.filter(i=>!BK[i.id]).map(i=>i.id);
     for(let k=0;k<falt.length;k+=60){const r=await adm({action:"get",ids:falt.slice(k,k+60)});Object.assign(BK,r.docs||{})}
     if(falt.length)store.set("bkcache",BK);
@@ -1250,11 +1252,11 @@ const INSTALADO=(window.matchMedia&&matchMedia("(display-mode: standalone)").mat
 const h=(location.hash||"").slice(1);if(TABS_C.some(x=>x[0]===h))S.tab=h;
 if(APP==="admin"){render();initCloud().finally(()=>{if(S.cloud==="off")S.cloud="pronto";render()})}
 else if(APP==="adminweb"){render();carregaAdmin();registraAparelho(INSTALADO?"app":"web");
-  setInterval(()=>{if(document.visibilityState==="visible"&&S.auth==="ok")carregaAdmin(true)},20000);
+  setInterval(()=>{if(document.visibilityState==="visible"&&S.auth==="ok")carregaAdmin(true)},30000);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.auth==="ok")carregaAdmin(true)});
   if("serviceWorker" in navigator)navigator.serviceWorker.addEventListener("message",e=>{if(e.data==="atualizar"&&S.auth==="ok")carregaAdmin(true)})}
 else{render();if(API){registraAparelho(INSTALADO?"app":"web");carregaOcupados();syncMeus();
-  setInterval(()=>{if(document.visibilityState==="visible"){if(S.tab==="agendar"&&S.step===3)carregaOcupados();if(S.tab==="conta")syncMeus()}},30000);
+  setInterval(()=>{if(document.visibilityState==="visible"){if(S.tab==="agendar"&&S.step===3)carregaOcupados();if(S.tab==="conta")syncMeus()}},60000);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){syncMeus();carregaOcupados()}})}}
 </script>
 

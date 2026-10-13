@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { temArmazenamento, SEM_ARMAZENAMENTO, remove, brl, toMin, conflito, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
-  STATUS, LOJA, subValida, subHash, pushAdmin, pushCliente, quando } from "../lib/core.js";
+  STATUS, LOJA, subValida, subHash, pushAdmin, pushCliente, quando, versaoAgenda } from "../lib/core.js";
 // API do Painel do Barbeiro, protegida por PIN.
 function autorizado(req) {
   const pin = String(req.headers["x-pin"] || ""), ok = String(process.env.ADMIN_PIN || "");
@@ -16,9 +16,12 @@ export default async function handler(req, res) {
   }
   try {
     if (req.method === "GET") {
+      // Se o painel já tem a versão atual, responde só "nada mudou" (1 comando no banco).
+      const v = await versaoAgenda();
+      if (v && req.query && req.query.v === v) return send(res, 200, { mesmo: true, v });
       const [items, app, web, painel] = await Promise.all([index(), listAll("inst/cliente/app/"), listAll("inst/cliente/web/"), contar("inst/painel/app/")]);
       const appIds = new Set(app.map(b => b.pathname.split("/").pop())), visit = new Set([...appIds, ...web.map(b => b.pathname.split("/").pop())]);
-      return send(res, 200, { items: items.map(({ path, ...x }) => x), installs: { app: appIds.size, visitantes: visit.size, painel } });
+      return send(res, 200, { v, items: items.map(({ path, ...x }) => x), installs: { app: appIds.size, visitantes: visit.size, painel } });
     }
     const b = body(req);
     if (b.action === "get") {
