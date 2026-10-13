@@ -38,22 +38,5 @@
     }
    ]
   }
- ],
- "redirects": [
-  {
-   "source": "/admin",
-   "destination": "/painel",
-   "permanent": true
-  },
-  {
-   "source": "/adm",
-   "destination": "/painel",
-   "permanent": true
-  },
-  {
-   "source": "/barbeiro",
-   "destination": "/painel",
-   "permanent": true
-  }
  ]
 }
