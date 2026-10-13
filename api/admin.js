@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { temArmazenamento, SEM_ARMAZENAMENTO, remove, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
+import { temArmazenamento, SEM_ARMAZENAMENTO, remove, brl, body, send, index, listAll, readJSON, putJSON, setStatus, bookingPath, calcServicos, fone11, novoId, limpa, BARBEIROS,
   STATUS, LOJA, subValida, subHash, pushAdmin, pushCliente, quando } from "../lib/core.js";
 // API do Painel do Barbeiro, protegida por PIN.
 function autorizado(req) {
@@ -31,6 +31,17 @@ export default async function handler(req, res) {
       const it = (await index()).find(x => x.id === b.id); if (!it) return send(res, 404, { erro: "Não encontrado." });
       await setStatus(it.id, b.status);
       if (b.status === "confirmado") await pushCliente(it.fone, { title: "Horário confirmado ✂️", body: `Te esperamos ${quando(it.data, it.hora)} na Bárbaros.`, tag: "ag-" + it.id }).catch(() => {});
+      let enviados = 0;
+      if (b.status === "concluido" || b.status === "faltou") {
+        const d = await readJSON(it.path), nome = (d?.nome || "").split(" ")[0] || "cliente";
+        if (b.status === "concluido") {
+          const cb = d?.pay === "app" ? Math.round(((d.preco || 0) - (d.cbUsado || 0)) * LOJA.cashback * 100) / 100 : 0;
+          enviados = await pushCliente(it.fone, { title: `Valeu pela visita, ${nome}! ✂️`, body: `Foi um prazer cuidar do seu visual na Bárbaros.${cb ? ` Você ganhou ${brl(cb)} de cashback para o próximo corte.` : ""} Quando quiser, agende o próximo pelo app.`, tag: "obrigado-" + it.id, url: "/#agendar" }).catch(() => 0);
+        } else {
+          enviados = await pushCliente(it.fone, { title: "Sentimos sua falta hoje ✂️", body: `Seu horário das ${it.hora} passou, ${nome}. Toque aqui para escolher um novo horário.`, tag: "falta-" + it.id, url: "/#agendar" }).catch(() => 0);
+        }
+        return send(res, 200, { ok: true, enviados });
+      }
       if (b.status === "cancelado") await pushCliente(it.fone, { title: "Horário cancelado", body: `Seu horário de ${quando(it.data, it.hora)} foi cancelado pela barbearia. Fale com a gente no WhatsApp.`, tag: "ag-" + it.id }).catch(() => {});
       return send(res, 200, { ok: true });
     }

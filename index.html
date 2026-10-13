@@ -873,7 +873,9 @@ async function carregaAdmin(silencioso){
 }
 async function setStatusWeb(id,st){
   const a=S.agenda.find(x=>x.id===id);if(!a||S.busy[id])return;S.busy[id]=1;
-  try{await adm({action:"status",id,status:st});a.status=st;toast(ST[st][0]+(st==="confirmado"?" · cliente avisado":""));render()}catch(e){toast(e.message||"Não foi possível salvar.")}
+  try{const r=await adm({action:"status",id,status:st});a.status=st;
+    if((st==="concluido"||st==="faltou")&&digits(a.fone).length>=10){S.sheet=MsgSheet(a,st,r.enviados||0);render();drawOverlay()}
+    else{toast(ST[st][0]+(st==="confirmado"?" · cliente avisado":""));render()}}catch(e){toast(e.message||"Não foi possível salvar.")}
   delete S.busy[id];
 }
 async function ativarAvisosAdmin(){
@@ -903,6 +905,26 @@ function ClienteSheet(k){
     <div class="hist">${itens.map(a=>{const[l,cl]=ST[a.status]||ST.pendente;return `<div class="it"><div style="min-width:0"><b>${esc(a.servicos.join(" + "))}</b><div class="tiny num">${DOWS[fromIso(a.data).getDay()]} ${br(a.data)} · ${a.hora} · ${a.pay==="app"?"Pix app":"na loja"}</div></div><div style="text-align:right;flex:none"><div class="price" style="font-size:14px">${brl((a.preco||0)-(a.cbUsado||0))}</div><span class="pill ${cl}">${l}</span></div></div>`}).join("")}</div>
     ${digits(c.fone).length>=10?`<a class="btn btn-wa" href="https://wa.me/55${digits(c.fone).slice(-11)}" target="_blank" rel="noopener">${ic("wa")} Conversar no WhatsApp</a>`:""}
   </div></div>`;
+}
+/* ======= mensagens para o cliente ======= */
+const URL_APP="https://barbaros-barbershop.vercel.app";
+function msgObrigado(a){
+  const n=(a.nome||"").split(" ")[0]||"";
+  const cb=a.pay==="app"?Math.round(((a.preco||0)-(a.cbUsado||0))*LOJA.cashback*100)/100:0;
+  return `Valeu pela preferência, ${n}! ✂️\n\nFoi um prazer cuidar do seu visual hoje na ${LOJA.nome}.${cb?`\n\nVocê ganhou ${brl(cb)} de cashback no Clube Bárbaros para usar no próximo corte.`:""}\n\nCurtiu o resultado? Marca a gente no Instagram @${LOJA.insta} 📸\n\nPara agendar o próximo horário: ${URL_APP}\n\nTamo junto!`;
+}
+function msgFalta(a){
+  const n=(a.nome||"").split(" ")[0]||"";
+  return `Fala, ${n}! Tudo certo?\n\nSentimos sua falta hoje às ${a.hora} aqui na ${LOJA.nome}. Aconteceu alguma coisa?\n\nBora remarcar? Escolha um novo horário pelo app: ${URL_APP}/#agendar\n\nOu responde essa mensagem que a gente encaixa você no melhor horário. 💈`;
+}
+function MsgSheet(a,st,enviados){
+  const ok=st==="concluido",txt=ok?msgObrigado(a):msgFalta(a);
+  return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Mensagem para o cliente">
+    <div class="between"><div><span class="eyebrow">${ok?"Atendimento concluído":"Cliente faltou"}</span><h2 style="margin-top:4px">${ok?"Agradecer ":"Reagendar "}${esc((a.nome||"").split(" ")[0])}</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <div class="note ${enviados?"info":""}">${enviados?`${ic("bell",'style="width:14px;height:14px;vertical-align:-2px"')} Notificação ${ok?"de agradecimento":"pedindo para reagendar"} enviada para o celular do cliente.`:"O cliente não ativou os avisos no celular. Mande a mensagem pelo WhatsApp."}</div>
+    <div class="field"><label class="small" for="msgwa">Mensagem (pode editar antes de enviar)</label><textarea id="msgwa" style="min-height:220px;font-size:14px">${esc(txt)}</textarea></div>
+    <button class="btn btn-wa" data-wamsg="${esc(digits(a.fone).slice(-11))}">${ic("wa")} Enviar no WhatsApp</button>
+    <button class="btn btn-ghost" data-closesheet>Agora não</button></div></div>`;
 }
 function Login(){
   const carregando=S.auth==="carregando";
@@ -1004,6 +1026,7 @@ document.addEventListener("click",async e=>{
   if(d.ast){setStatus(d.id,d.ast);return}
   if(d.apago&&APP==="adminweb"){try{await adm({action:"pago",id:d.apago});const a=S.agenda.find(x=>x.id===d.apago);if(a)a.pago=true;toast("Pagamento registrado");render()}catch(err){toast("Não foi possível salvar.")}return}
   if(d.cli){S.sheet=ClienteSheet(d.cli);drawOverlay();return}
+  if(d.wamsg){const t2=document.getElementById("msgwa");openLink(waTo("55"+d.wamsg,t2?t2.value:""));S.sheet=null;drawOverlay();toast("WhatsApp aberto com a mensagem");return}
   if(d.apagar){if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent="Toque de novo para apagar";setTimeout(()=>{if(t.isConnected){t.dataset.armed="";t.textContent="Apagar"}},4000);return}
     try{await adm({action:"apagar",id:d.apagar});delete BK[d.apagar];store.set("bkcache",BK);S.agenda=S.agenda.filter(x=>x.id!==d.apagar);toast("Agendamento apagado");render()}catch(err){toast(err.message||"Não foi possível apagar.")}return}
   if(d.sair!==undefined){S.pin="";store.set("pin","");S.auth="nao";S.agenda=[];render();return}
