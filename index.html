@@ -883,15 +883,15 @@ function Bloqueado(){
 }
 function Instalar(){
   const ua=navigator.userAgent||"",ios=/iPhone|iPad|iPod/i.test(ua),and=/Android/i.test(ua);
-  const nome=APP==="admin"?"Bárbaros Painel":"Bárbaros";
+  const painel=APP!=="cliente",nome=painel?"Bárbaros Painel":"Bárbaros";
   const iosSteps=`<ol class="rules"><li>Abra este link no <b>Safari</b>.</li><li>Toque em <b>Compartilhar</b> (o quadrado com a seta para cima).</li><li>Escolha <b>Adicionar à Tela de Início</b> e confirme com o nome <b>${nome}</b>.</li></ol>`;
-  const andSteps=`<ol class="rules"><li>Abra este link no <b>Chrome</b>.</li><li>Toque no menu <b>⋮</b> no canto de cima.</li><li>Escolha <b>Adicionar à tela inicial</b> (ou <b>Instalar app</b>) e confirme com o nome <b>${nome}</b>.</li></ol>`;
+  const andSteps=`<ol class="rules"><li>Abra este link no <b>Chrome</b>.</li><li>Toque no menu <b>⋮</b> no canto de cima.</li><li>Escolha <b>Adicionar à tela inicial</b> (ou <b>Instalar app</b>) e confirme com o nome <b>${nome}</b>.</li></ol><p class="tiny" style="margin:0">Aparecer “Não foi possível abrir o aplicativo”? Desinstale os ícones antigos da Bárbaros, abra o Chrome em Configurações → Configurações do site → Todos os sites → barbaros-barbershop.vercel.app → <b>Limpar e redefinir</b>, e instale de novo.</p>`;
   return `<div class="sheet" data-close><div class="panel" role="dialog" aria-modal="true" aria-label="Instalar no celular">
-    <div class="between"><div><span class="eyebrow">Atalho no celular</span><h2 style="margin-top:4px">Instalar ${nome}</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
+    <div class="between"><div><span class="eyebrow">${painel?"Só para o barbeiro":"Atalho no celular"}</span><h2 style="margin-top:4px">Instalar ${nome}</h2></div><button class="lb-x" data-closesheet aria-label="Fechar">${ic("x")}</button></div>
     <p class="small" style="margin:0">O app ganha um ícone na tela inicial do celular e abre direto, como um aplicativo.</p>
     ${ios||!and?`<div class="card pad stack"><h3>iPhone</h3>${iosSteps}</div>`:""}
     ${and||!ios?`<div class="card pad stack"><h3>Android</h3>${andSteps}</div>`:""}
-    <button class="btn btn-line" data-copy="${APP==="admin"?"https://claude.ai/artifact/7Y6D9iMtdH4igw1ggPycoR":URL_CLIENTE}" data-msg="Link copiado">${ic("copy")} Copiar link do app</button>
+    <button class="btn btn-line" data-copy="${painel?(APP==="adminweb"?location.origin+"/painel":"https://claude.ai/artifact/7Y6D9iMtdH4igw1ggPycoR"):URL_CLIENTE}" data-msg="Link copiado">${ic("copy")} Copiar link do app</button>
     <p class="tiny" style="margin:0">Se o app abriu dentro do Instagram ou do WhatsApp, toque nos três pontinhos e escolha <b>Abrir no navegador</b> antes.</p></div></div>`;
 }
 /* ======= render ======= */

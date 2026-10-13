@@ -27,7 +27,7 @@
  "name": "Bárbaros Painel",
  "short_name": "Bárbaros Painel",
  "description": "Painel do barbeiro",
- "id": "/painel",
- "start_url": "/painel",
+ "id": "/app-painel",
+ "start_url": "/painel?app=1",
  "scope": "/painel"
 }

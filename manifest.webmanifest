@@ -27,7 +27,7 @@
  "name": "Bárbaros Barbershop",
  "short_name": "Bárbaros",
  "description": "Agendamento online da Bárbaros Barbershop",
- "id": "/",
- "start_url": "/",
+ "id": "/app-cliente",
+ "start_url": "/?app=1",
  "scope": "/"
 }
