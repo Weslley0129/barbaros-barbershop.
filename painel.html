@@ -49,7 +49,8 @@ a{color:inherit}
 .local{overflow:hidden}
 .mapa{position:relative;aspect-ratio:16/10;background:#15171a;border-bottom:1px solid var(--line)}
 .mapa iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(.15) contrast(1.05)}
-.mapa .mload{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.mapa .mload{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:6px;color:var(--muted);font-size:13px;text-align:center;padding:16px;z-index:1;pointer-events:none}
+.mapa .mload button{pointer-events:auto}
 .local .end{display:flex;gap:10px;align-items:flex-start}
 .local .end svg{width:22px;height:22px;flex:none;color:var(--gold-2);margin-top:2px}
 .btn-waze{background:#33CCFF;color:#04232e;border:0}
@@ -508,7 +509,7 @@ const S={
   meus:store.get("meus",[]),
   // admin / nuvem
   db:null, user:null, isAdmin:false, cfg:{barbeiros:BARB_PADRAO,pixChave:LOJA.pixChave,endereco:LOJA.endereco}, busy:{},
-  agenda:[], clientes:{}, aTab:"agenda", aFiltro:"todos", dPer:"7", aDay:iso(new Date()), aView:"dia", cloud:"off",
+  agenda:[], clientes:{}, aTab:"agenda", aFiltro:"dia", dPer:"7", aDay:iso(new Date()), aView:"dia", cloud:"off",
   pin:store.get("pin",""), auth:"nao", inst:null, qcli:"", cbServer:null, enviando:false,
 };
 const barbs=()=>S.cfg.barbeiros&&S.cfg.barbeiros.length?S.cfg.barbeiros:BARB_PADRAO;
@@ -710,12 +711,25 @@ function Portfolio(){
 const mapsDir=()=>"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(LOJA.mapaQ);
 const wazeUrl=()=>"https://waze.com/ul?q="+encodeURIComponent(LOJA.mapaQ)+"&navigate=yes";
 function Localizacao(){
-  return `<div class="card local" id="onde"><div class="mapa"><span class="mload">Carregando mapa…</span><iframe title="Mapa: ${esc(LOJA.endereco)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="https://maps.google.com/maps?q=${encodeURIComponent(LOJA.mapaQ)}&z=16&hl=pt-BR&output=embed"></iframe></div>
+  return `<div class="card local" id="onde"><div class="mapa"><span class="mload">Carregando mapa…</span><iframe id="mapaframe" title="Mapa: ${esc(LOJA.endereco)}" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
   <div class="pad stack"><span class="eyebrow">Onde estamos</span><div class="end">${ic("pin")}<div><b>Av. Dr. Timóteo Penteado, 2582</b><div class="small">Guarulhos – SP</div></div></div>
   <div class="row"><a class="btn btn-gold btn-sm" style="flex:1" href="${mapsDir()}" target="_blank" rel="noopener">${ic("nav")} Como chegar</a><a class="btn btn-waze btn-sm" style="flex:1" href="${wazeUrl()}" target="_blank" rel="noopener">${ic("nav")} Waze</a></div></div></div>`;
 }
 // O mapa fica fora do #app para não recarregar a cada toque na tela.
-function localSync(on,pad){const el=document.getElementById("local");if(!el)return;if(on&&!el.firstChild)el.innerHTML=Localizacao();el.hidden=!on;el.style.paddingBottom=on?pad:""}
+const MAPA_URL=()=>"https://www.google.com/maps?q="+encodeURIComponent(LOJA.mapaQ)+"&z=16&hl=pt-BR&output=embed";
+// Carrega o mapa só depois que o cartão está visível e tenta de novo sozinho se o Google não responder.
+const MAPA={ok:false,tent:0,timer:0};
+function carregaMapa(){
+  const f=document.getElementById("mapaframe");if(!f||MAPA.ok)return;
+  clearTimeout(MAPA.timer);MAPA.tent++;
+  f.onload=()=>{MAPA.ok=true;clearTimeout(MAPA.timer);const l=f.parentNode.querySelector(".mload");if(l)l.remove()};
+  f.src=MAPA_URL()+(MAPA.tent>1?"&t="+Date.now():"");
+  if(MAPA.tent<4)MAPA.timer=setTimeout(()=>{if(!MAPA.ok)carregaMapa()},5000);
+  else MAPA.timer=setTimeout(()=>{if(!MAPA.ok){const l=f.parentNode.querySelector(".mload");if(l)l.innerHTML='Não foi possível carregar o mapa. <button class="link" data-mapa>Tentar de novo</button>'}},7000);
+}
+function localSync(on,pad){const el=document.getElementById("local");if(!el)return;if(on&&!el.firstChild)el.innerHTML=Localizacao();el.hidden=!on;el.style.paddingBottom=on?pad:"";
+  if(on&&!MAPA.ok&&!MAPA.tent)requestAnimationFrame(()=>setTimeout(carregaMapa,60))}
+addEventListener("online",()=>{if(!MAPA.ok){MAPA.tent=0;carregaMapa()}});
 function Barbeiro(){
   return `<div class="card pad stack"><div class="barber-pic"><img src="${IMG.barbeiro}" alt="Barbeiro da Bárbaros com a máquina na mão"><div><span class="eyebrow">A casa</span><h2 style="margin-top:4px">${LOJA.nome}</h2><p class="small" style="margin:2px 0 0">Atendimento com hora marcada, de terça a sábado.</p></div></div>
   <ul class="rules"><li>Ter a sáb, 9h às 19h · almoço 12h30–13h30</li><li>Agende com pelo menos 1h de antecedência</li><li>Cancelamento até 30 min antes do horário</li>${S.cfg.endereco?`<li>${esc(S.cfg.endereco)}</li>`:""}</ul>
@@ -724,8 +738,8 @@ function Barbeiro(){
 
 /* ======= painel do barbeiro ======= */
 const ST={pendente:["A confirmar","warn"],confirmado:["Confirmado","ok"],atendendo:["Em atendimento","info"],concluido:["Concluído","ok"],cancelado:["Cancelado","bad"],faltou:["Faltou","bad"]};
-const FILTROS=[["todos","Todos os clientes"],["pendente","A confirmar"],["confirmado","Confirmado"],["atendendo","Em atendimento"],["remarcado","Remarcados"],["faltou","Falta"]];
-const casaFiltro=(a,f)=>f==="todos"||(f==="remarcado"?!!a.remarcadoEm:a.status===f);
+const FILTROS=[["dia","Agenda do dia"],["todos","Todos os clientes"],["pendente","A confirmar"],["confirmado","Confirmado"],["atendendo","Em atendimento"],["remarcado","Remarcados"],["faltou","Falta"]];
+const casaFiltro=(a,f)=>f==="todos"||f==="dia"||(f==="remarcado"?!!a.remarcadoEm:a.status===f);
 function agRow(a,comData){
   const [l,c]=ST[a.status]||ST.pendente; const bn=barbs().find(b=>b.id===a.barb)?.nome||"Qualquer";
   return `<div class="ag st-${a.status}"><div class="hr">${comData?`<small class="dt">${DOWS[fromIso(a.data).getDay()]} ${br(a.data).slice(0,5)}</small>`:""}${a.hora}<small>${hm(toMin(a.hora)+a.min)}</small></div><div style="min-width:0">
@@ -745,17 +759,17 @@ function agRow(a,comData){
 }
 function filtroSelect(){
   const n=f=>S.agenda.filter(a=>casaFiltro(a,f)).length;
-  return `<label class="filtro">${ic("user",'style="width:18px;height:18px;color:var(--muted);flex:none"')}<select id="afiltro" aria-label="Filtrar agenda">${FILTROS.map(([v,l])=>`<option value="${v}" ${S.aFiltro===v?"selected":""}>${l}${v==="todos"?"":" ("+n(v)+")"}</option>`).join("")}</select></label>`;
+  return `<label class="filtro">${ic("user",'style="width:18px;height:18px;color:var(--muted);flex:none"')}<select id="afiltro" aria-label="Filtrar agenda">${FILTROS.map(([v,l])=>`<option value="${v}" ${S.aFiltro===v?"selected":""}>${l}${v==="dia"?"":" ("+n(v)+")"}</option>`).join("")}</select></label>`;
 }
 function PainelAgenda(){
-  const day=S.aDay, d=fromIso(day), filtro=S.aFiltro||"todos";
+  const day=S.aDay, d=fromIso(day), filtro=S.aFiltro||"dia";
   const items=S.agenda.filter(a=>a.data===day).sort((a,b)=>a.hora.localeCompare(b.hora));
   const ativos=items.filter(a=>!["cancelado","faltou"].includes(a.status));
   const fat=ativos.reduce((s,a)=>s+(a.preco-(a.cbUsado||0)),0);
   const strip=[];const base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-1);
   for(let k=0;k<15;k++){const x=new Date(base);x.setDate(base.getDate()+k);strip.push(x)}
   let rows="",titulo;
-  if(filtro==="todos"){
+  if(filtro==="dia"){
     let lunchShown=false;
     for(const a of items){ if(!lunchShown&&toMin(a.hora)>=LOJA.almoco[1]){rows+=`<div class="lunch">Almoço 12:30–13:30</div>`;lunchShown=true} rows+=agRow(a)}
     if(!items.length) rows=`<div class="card empty"><span>${lojaAberta(d)?"Nenhum horário marcado neste dia.":"Barbearia fechada neste dia."}</span></div>`;
@@ -772,7 +786,7 @@ function PainelAgenda(){
   const amanha=new Date();amanha.setDate(amanha.getDate()+1);const amanhaIso=iso(amanha);
   const lemb=S.agenda.filter(a=>a.data===amanhaIso&&["pendente","confirmado"].includes(a.status)&&a.fone);
   return `${filtroSelect()}
-  ${filtro==="todos"?`<div class="days">${strip.map(x=>`<button class="day ${day===iso(x)?"sel":""}" data-aday="${iso(x)}"><small>${DOWS[x.getDay()]}</small><b>${x.getDate()}</b><i>${lojaAberta(x)?S.agenda.filter(a=>a.data===iso(x)&&!["cancelado","faltou"].includes(a.status)).length+" ag.":"fechado"}</i></button>`).join("")}</div>
+  ${filtro==="dia"?`<div class="days">${strip.map(x=>`<button class="day ${day===iso(x)?"sel":""}" data-aday="${iso(x)}"><small>${DOWS[x.getDay()]}</small><b>${x.getDate()}</b><i>${lojaAberta(x)?S.agenda.filter(a=>a.data===iso(x)&&!["cancelado","faltou"].includes(a.status)).length+" ag.":"fechado"}</i></button>`).join("")}</div>
   <div class="kpis"><div class="kpi"><b>${ativos.length}</b><span>atendimentos</span></div><div class="kpi"><b class="num" style="font-size:16px">${brl(fat)}</b><span>previsto</span></div><div class="kpi"><b>${items.filter(a=>a.status==="pendente").length}</b><span>a confirmar</span></div></div>
   ${lemb.length?`<div class="card pad stack"><div class="between"><h3>${ic("bell",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} Lembretes de amanhã</h3><span class="pill warn">${lemb.length}</span></div><p class="tiny" style="margin:0">Um toque abre o WhatsApp do cliente com a mensagem pronta.</p>${lemb.map(a=>`<a class="btn btn-line btn-sm" href="${waTo("55"+digits(a.fone).replace(/^55/,""),lembrete(a))}" target="_blank" rel="noopener">${a.hora} · ${esc(a.nome)}</a>`).join("")}</div>`:""}`:""}
   <div class="stack" style="gap:10px"><h2>${titulo}</h2><div class="row" style="gap:8px">${APP==="adminweb"?`<button class="btn btn-ghost btn-sm" style="flex:1" data-limpar>${ic("trash")} Limpar agenda</button>`:""}<button class="btn btn-gold btn-sm" style="flex:1" data-novoag>${ic("plus")} Novo agendamento</button></div></div>
@@ -1211,6 +1225,7 @@ document.addEventListener("click",async e=>{
   if(d.lbgo!==undefined){LB=null;S.tab="agendar";S.done=null;render();window.scrollTo({top:0});return}
   // admin
   if(d.mode){S.mode=d.mode;render();window.scrollTo({top:0});return}
+  if(d.mapa!==undefined){MAPA.tent=0;MAPA.ok=false;const l=document.querySelector("#onde .mload");if(l)l.textContent="Carregando mapa…";carregaMapa();return}
   if(d.atab){S.aTab=d.atab;render();window.scrollTo({top:0});return}
   if(d.dper){S.dPer=d.dper;render();return}
   if(d.dfiltro){S.aFiltro=d.dfiltro;S.aTab="agenda";render();window.scrollTo({top:0});return}
