@@ -9,6 +9,8 @@ export default async function handler(req, res) {
     const meus = items.filter(x => x.fone === fone && ids.includes(x.id));
     const status = Object.fromEntries(meus.map(x => [x.id, { status: x.status, pago: x.pago, data: x.data, hora: x.hora }]));
     const saldo = meus.length ? await saldoCliente(items, fone) : null;
-    send(res, 200, { status, saldo });
+    // códigos que não existem mais no servidor (agenda limpa/apagada): o app tira da lista do cliente
+    const faltam = ids.filter(id => !items.some(x => x.id === id));
+    send(res, 200, { status, saldo, faltam });
   } catch (e) { console.error(e); send(res, 500, { erro: "Falha ao consultar." }); }
 }

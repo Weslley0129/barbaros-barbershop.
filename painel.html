@@ -418,13 +418,29 @@ const waTo=(num,txt)=>`https://wa.me/${num}?text=${encodeURIComponent(txt)}`;
 /* ======= servidor ======= */
 const DEV=(()=>{let d=store.get("dev","");if(!/^[a-z0-9]{8,40}$/.test(d)){d=(Math.random().toString(36).slice(2)+Date.now().toString(36)).slice(0,24);store.set("dev",d)}return d})();
 async function api(path,opt={}){
-  const r=await fetch(API+path,{...opt,headers:{"content-type":"application/json",...(opt.headers||{})},cache:"no-store"});
+  // 15 s de limite: sem internet boa, o app avisa em vez de ficar travado
+  const ctl=typeof AbortController!=="undefined"?new AbortController():null,tm=ctl?setTimeout(()=>ctl.abort(),15000):0;
+  let r;try{r=await fetch(API+path,{...opt,headers:{"content-type":"application/json",...(opt.headers||{})},cache:"no-store",signal:ctl?ctl.signal:undefined})}
+  catch(e){const er=new Error("Sem conexão com o servidor. Verifique a internet e tente de novo.");er.status=0;throw er}
+  finally{clearTimeout(tm)}
   let j={};try{j=await r.json()}catch(e){}
   if(!r.ok){const er=new Error(j.erro||("Erro "+r.status));er.status=r.status;throw er}
   return j;
 }
 function b64u(t){const p="=".repeat((4-t.length%4)%4);const b=atob((t+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from([...b].map(c=>c.charCodeAt(0)))}
 const PUSH_OK=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+// Re-registra em silêncio a inscrição de avisos (sem pedir permissão de novo), uma vez por abertura do app.
+let PUSH_REFORCADO=false;
+async function reforcaPush(){
+  if(PUSH_REFORCADO||!API||!PUSH_OK()||typeof Notification==="undefined"||Notification.permission!=="granted"||!store.get("push",false))return;
+  PUSH_REFORCADO=true;
+  try{const reg=await navigator.serviceWorker.ready;
+    const sub=(await reg.pushManager.getSubscription())||(await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID)}));
+    if(!sub)return;
+    if(APP==="adminweb"){if(S.pin)await adm({action:"sub",sub})}
+    else{const f=digits(S.fone||(S.meus[S.meus.length-1]||{}).fone||"");if(f.length>=10)await api("/sub",{method:"POST",body:JSON.stringify({fone:f,sub})})}
+  }catch(e){PUSH_REFORCADO=false}
+}
 async function inscreverPush(){
   if(!PUSH_OK()){toast(/iPhone|iPad/i.test(navigator.userAgent)?"No iPhone, instale o app na tela inicial para receber avisos.":"Este navegador não recebe avisos.");return null}
   const perm=await Notification.requestPermission();
@@ -438,13 +454,25 @@ async function ativarAvisosCliente(){
 }
 async function carregaOcupados(){if(!API)return;try{const j=await api("/ocupados");OCUP=j.dias||{};if(S.tab==="agendar")render()}catch(e){}}
 async function syncMeus(){
-  if(!API||!S.meus.length)return;const fone=S.fone||S.meus[S.meus.length-1].fone;
-  try{const j=await api("/meus?fone="+encodeURIComponent(digits(fone))+"&ids="+S.meus.slice(-40).map(b=>b.id).join(","));
-    let mud=false;for(const b of S.meus){const x=j.status&&j.status[b.id];if(x&&(x.status!==b.status||x.pago!==b.pago||(x.data&&(x.data!==b.data||x.hora!==b.hora)))){b.status=x.status;b.pago=x.pago;if(x.data){b.data=x.data;b.hora=x.hora}mud=true}}
-    if(typeof j.saldo==="number"&&j.saldo!==S.cbServer){S.cbServer=j.saldo;mud=true}
-    if(mud){store.set("meus",S.meus);render()}}catch(e){}
+  if(!API||!S.meus.length)return;
+  const f11=x=>digits(x||"").slice(-11);
+  // consulta por telefone (normalmente um só); horários que o servidor não tem mais saem da lista
+  const fones=[...new Set(S.meus.filter(b=>b.registrado).map(b=>f11(b.fone)).filter(x=>x.length>=10))].slice(0,3);
+  if(!fones.length)return;
+  let mud=false;
+  for(const fone of fones){
+    try{const meus=S.meus.filter(b=>b.registrado&&f11(b.fone)===fone).slice(-40);
+      const j=await api("/meus?fone="+fone+"&ids="+meus.map(b=>b.id).join(","));
+      if(!j||typeof j.status!=="object")continue;
+      for(const b of meus){const x=j.status[b.id];
+        if(!x){if(Array.isArray(j.faltam)&&j.faltam.includes(b.id)){b.sumiu=true;mud=true}continue}
+        if(x.status!==b.status||x.pago!==b.pago||(x.data&&(x.data!==b.data||x.hora!==b.hora))){b.status=x.status;b.pago=x.pago;if(x.data){b.data=x.data;b.hora=x.hora}mud=true}}
+      if(typeof j.saldo==="number"&&j.saldo!==S.cbServer){S.cbServer=j.saldo;mud=true}
+    }catch(e){}
+  }
+  if(mud){S.meus=S.meus.filter(b=>!b.sumiu);store.set("meus",S.meus);render()}
 }
-function registraAparelho(modo){if(!API)return;const app=APP==="adminweb"?"painel":"cliente",k="inst:"+app+":"+modo;if(store.get(k,false))return;
+function registraAparelho(modo){if(!API)return;const app=APP==="adminweb"?"painel":"cliente",k="inst2:"+app+":"+modo;if(store.get(k,false))return;
   api("/install",{method:"POST",body:JSON.stringify({device:DEV,modo,app})}).then(()=>store.set(k,true)).catch(()=>{})}
 
 /* ======= Pix (BR Code estático, padrão Banco Central) ======= */
@@ -986,7 +1014,7 @@ async function carregaAdmin(silencioso){
     for(let k=0;k<falt.length;k+=60){const r=await adm({action:"get",ids:falt.slice(k,k+60)});Object.assign(BK,r.docs||{})}
     if(falt.length)store.set("bkcache",BK);
     S.agenda=j.items.filter(i=>BK[i.id]).map(i=>({...BK[i.id],id:i.id,status:i.status,pago:i.pago}));
-    S.inst=j.installs;S.aviso=j.aviso||"";S.auth="ok";S.cloud="on";S.loginErr="";store.set("pin",S.pin);
+    S.inst=j.installs;S.aviso=j.aviso||"";S.auth="ok";S.cloud="on";S.loginErr="";store.set("pin",S.pin);reforcaPush();
   }catch(e){
     if(e.status===401){S.pin="";store.set("pin","");S.auth="nao";S.loginErr="PIN incorreto."}
     else{S.cloud="erro";if(S.auth!=="ok"){S.auth="nao";S.loginErr=e.status?(e.message||"Erro no servidor. Tente de novo."):"Sem internet ou servidor fora do ar. Tente de novo."}}
@@ -1255,7 +1283,7 @@ else if(APP==="adminweb"){render();carregaAdmin();registraAparelho(INSTALADO?"ap
   setInterval(()=>{if(document.visibilityState==="visible"&&S.auth==="ok")carregaAdmin(true)},30000);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.auth==="ok")carregaAdmin(true)});
   if("serviceWorker" in navigator)navigator.serviceWorker.addEventListener("message",e=>{if(e.data==="atualizar"&&S.auth==="ok")carregaAdmin(true)})}
-else{render();if(API){registraAparelho(INSTALADO?"app":"web");carregaOcupados();syncMeus();
+else{render();if(API){registraAparelho(INSTALADO?"app":"web");carregaOcupados();syncMeus();reforcaPush();
   setInterval(()=>{if(document.visibilityState==="visible"){if(S.tab==="agendar"&&S.step===3)carregaOcupados();if(S.tab==="conta")syncMeus()}},60000);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){syncMeus();carregaOcupados()}})}}
 </script>
